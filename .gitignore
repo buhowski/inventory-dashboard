@@ -30,3 +30,4 @@ yarn-error.log*
 # OS and editor files
 .DS_Store
 *.tsbuildinfo
+tz.pdf

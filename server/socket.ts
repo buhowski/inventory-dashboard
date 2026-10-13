@@ -1,7 +1,7 @@
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 
-const port = Number(process.env.SOCKET_PORT ?? 3001);
+const port = Number(process.env.PORT ?? process.env.SOCKET_PORT ?? 3001);
 const allowedOrigin = process.env.APP_ORIGIN ?? 'http://localhost:3000';
 
 // Publish the live connection count.
