@@ -1,0 +1,21 @@
+// Shared layout breakpoints.
+$breakpoint-wide: 1270px;
+$breakpoint-tablet: 1050px;
+$breakpoint-mobile: 740px;
+
+// Application color tokens.
+:root {
+  --page: #f5f7f8;
+  --surface: #ffffff;
+  --surface-soft: #f8fafb;
+  --ink: #23333c;
+  --ink-light: #52646e;
+  --muted: #8c9ba4;
+  --line: #e7ecef;
+  --line-strong: #dce4e8;
+  --green: #80bd43;
+  --green-dark: #609b2c;
+  --green-soft: #edf6e5;
+  --blue: #729bb5;
+  --shadow: 0 12px 34px rgb(31 53 65 / 5%);
+}

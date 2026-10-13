@@ -1,0 +1,401 @@
+@use "tokens" as *;
+
+// Tune layouts at breakpoints.
+@media (max-width: $breakpoint-wide) {
+  .topbar {
+    grid-template-columns: 208px minmax(220px, 420px) 1fr;
+    gap: 20px;
+  }
+
+  .sidebar {
+    width: 208px;
+  }
+
+  .app {
+    &__main {
+      margin-left: 208px;
+    }
+  }
+
+  .orders {
+    &.orders--has-detail {
+      grid-template-columns: minmax(0, 1fr) minmax(330px, 0.95fr);
+    }
+  }
+}
+
+@media (max-width: $breakpoint-tablet) {
+  .topbar {
+    grid-template-columns: 195px minmax(190px, 1fr) auto;
+    gap: 15px;
+    padding-right: 22px;
+  }
+
+  .sidebar {
+    width: 195px;
+  }
+
+  .app {
+    &__main {
+      margin-left: 195px;
+      padding-right: 24px;
+      padding-left: 24px;
+    }
+  }
+
+  .orders {
+    &.orders--has-detail {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .order-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    &__top {
+      grid-row: span 2;
+    }
+    &__summary {
+      align-self: start;
+    }
+    &__products-heading {
+      grid-column: 2;
+    }
+    &__products {
+      grid-column: 2;
+    }
+    &__footer {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+@media (max-width: $breakpoint-mobile) {
+  .app {
+    padding-top: 0;
+    padding-bottom: 66px;
+  }
+
+  .topbar {
+    position: sticky;
+    height: 61px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    padding: 0 17px;
+  }
+
+  .topbar > .brand {
+    display: none;
+  }
+
+  .topbar > .search {
+    grid-column: 1;
+    grid-row: 1;
+    height: 37px;
+  }
+
+  .live-status {
+    grid-column: 2;
+    grid-row: 1;
+    gap: 8px;
+    &__clock {
+      display: none;
+    }
+  }
+
+  .presence {
+    min-width: 0;
+    padding: 7px 9px;
+  }
+
+  .sidebar {
+    position: fixed;
+    z-index: 30;
+    inset: auto 0 0;
+    display: flex;
+    width: auto;
+    height: 64px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 14px;
+    border-top: 1px solid #e8edef;
+    border-right: 0;
+    box-shadow: 0 -5px 20px rgb(32 49 60 / 4%);
+  }
+
+  .profile,
+  .nav__label,
+  .nav__label--secondary,
+  .nav[aria-label="Management"],
+  .sidebar__bottom {
+    display: none;
+  }
+
+  .nav[aria-label="Main navigation"] {
+    display: flex;
+    width: min(100%, 390px);
+    justify-content: space-around;
+    gap: 10px;
+  }
+
+  .nav {
+    &__item {
+      height: 45px;
+      flex: 1;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      padding: 4px 8px;
+      font-size: 9px;
+    }
+    &__active-dot {
+      position: absolute;
+      top: 4px;
+      right: calc(50% - 12px);
+      width: 5px;
+      height: 5px;
+    }
+  }
+
+  .app {
+    &__main {
+      min-height: calc(100vh - 61px);
+      margin-left: 0;
+      padding: 25px 17px 31px;
+    }
+    &__mobile-brand {
+      display: none;
+    }
+  }
+
+  .page {
+    &__heading {
+      min-height: 80px;
+      align-items: flex-start;
+      margin-bottom: 19px;
+    }
+    &__heading h1 {
+      margin-top: 9px;
+      font-size: 27px;
+    }
+    &__description {
+      max-width: 240px;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+  }
+
+  .button {
+    &--primary {
+      min-height: 34px;
+      gap: 5px;
+      padding: 0 9px;
+      font-size: 9px;
+    }
+    &--primary svg {
+      width: 14px;
+    }
+  }
+
+  .overview {
+    gap: 7px;
+    margin-bottom: 20px;
+    &__card {
+      min-height: 73px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      padding: 9px;
+    }
+    &__icon {
+      width: 23px;
+      height: 23px;
+      border-radius: 7px;
+    }
+    &__icon svg {
+      width: 13px;
+      height: 13px;
+    }
+    &__card > div {
+      gap: 3px;
+    }
+    &__label {
+      font-size: 7px;
+      letter-spacing: 0.03em;
+    }
+    &__card strong {
+      font-size: 16px;
+    }
+    &__trend,
+    &__caption {
+      display: none;
+    }
+  }
+
+  .orders {
+    &__section {
+      padding: 14px 11px 12px;
+    }
+    &__heading {
+      margin-bottom: 12px;
+    }
+    &__heading h2 {
+      font-size: 12px;
+    }
+    &__filter {
+      height: 28px;
+      gap: 4px;
+      padding: 0 7px;
+      font-size: 9px;
+    }
+    &__filter svg {
+      width: 13px;
+    }
+    &__list {
+      gap: 7px;
+    }
+  }
+
+  .order-card {
+    min-height: 69px;
+    &__main {
+      min-height: 67px;
+      grid-template-columns: 27px minmax(90px, 1fr) minmax(72px, 0.58fr) 19px;
+      gap: 7px;
+      padding: 8px 8px;
+    }
+    &__index {
+      width: 25px;
+      height: 25px;
+      font-size: 9px;
+    }
+    &__title {
+      font-size: 9px;
+    }
+    &__id,
+    &__date--long {
+      font-size: 8px;
+    }
+    &__date--short {
+      font-size: 8px;
+    }
+    &__total {
+      display: none;
+    }
+    &__open {
+      width: 19px;
+      height: 19px;
+      opacity: 1;
+      transform: none;
+    }
+    &__open svg {
+      width: 13px;
+    }
+    &__delete {
+      right: 7px;
+      bottom: -29px;
+      width: 25px;
+      height: 25px;
+      background: #ffffff;
+    }
+    &:hover &__delete,
+    &:focus-within &__delete {
+      opacity: 0;
+      pointer-events: none;
+    }
+    &:focus-within &__delete:focus-visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  .order-details {
+    display: block;
+    &__top {
+      padding: 18px 15px 14px;
+    }
+    &__top h2 {
+      font-size: 14px;
+    }
+    &__summary {
+      padding: 12px 15px;
+    }
+    &__products-heading {
+      padding: 14px 15px 7px;
+    }
+    &__products {
+      padding: 0 12px;
+    }
+    &__footer {
+      padding: 8px 13px;
+    }
+  }
+
+  .catalog {
+    &__heading {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    &__filter {
+      width: 100%;
+      height: 38px;
+    }
+    &__filter select {
+      flex: 1;
+    }
+    &__toolbar {
+      min-height: 43px;
+      padding: 0 10px;
+    }
+    &__toolbar-label {
+      gap: 6px;
+      font-size: 8px;
+    }
+    &__toolbar-label > span:last-child {
+      font-size: 7px;
+    }
+    &__sort {
+      font-size: 8px;
+    }
+    &__table {
+      min-width: 910px;
+    }
+    &__table th:first-child,
+    &__table td:first-child {
+      padding-left: 11px;
+    }
+    &__table td {
+      height: 64px;
+      padding-right: 9px;
+      padding-left: 9px;
+    }
+    &__table-footer {
+      padding: 0 10px;
+      font-size: 8px;
+    }
+    &__note {
+      font-size: 8px;
+    }
+  }
+
+  .delete-dialog {
+    padding: 23px 19px 19px;
+    &__actions .button {
+      padding: 0 10px;
+      font-size: 10px;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
