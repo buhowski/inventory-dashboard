@@ -2,9 +2,16 @@
 
 import { useEffect, useState, type ReactNode } from 'react';
 import { Provider } from 'react-redux';
-import { loadInventory, makeStore, setDeletedOrderIds, type AppStore } from '@/lib/store';
+import {
+	loadInventory,
+	makeStore,
+	setDeletedOrderIds,
+	setDeletedProductIds,
+	type AppStore,
+} from '@/lib/store';
 
-const storageKey = 'inventory.deletedOrders';
+const deletedOrderStorageKey = 'inventory.deletedOrders';
+const deletedProductStorageKey = 'inventory.deletedProducts';
 
 // Restore inventory in the browser.
 export function Providers({ children }: { children: ReactNode }) {
@@ -13,11 +20,18 @@ export function Providers({ children }: { children: ReactNode }) {
 
 	useEffect(() => {
 		try {
-			const storedIds = window.localStorage.getItem(storageKey);
-			if (storedIds) {
-				const parsedIds: unknown = JSON.parse(storedIds);
+			const storedOrderIds = window.localStorage.getItem(deletedOrderStorageKey);
+			const storedProductIds = window.localStorage.getItem(deletedProductStorageKey);
+			if (storedOrderIds) {
+				const parsedIds: unknown = JSON.parse(storedOrderIds);
 				if (Array.isArray(parsedIds) && parsedIds.every((id) => typeof id === 'string')) {
 					store.dispatch(setDeletedOrderIds(parsedIds));
+				}
+			}
+			if (storedProductIds) {
+				const parsedIds: unknown = JSON.parse(storedProductIds);
+				if (Array.isArray(parsedIds) && parsedIds.every((id) => typeof id === 'string')) {
+					store.dispatch(setDeletedProductIds(parsedIds));
 				}
 			}
 		} catch (error) {

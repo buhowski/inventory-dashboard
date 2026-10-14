@@ -179,7 +179,7 @@ export function OrdersView() {
 												<strong>{formatPrice(totals.USD ?? 0, 'USD')}</strong>
 												<span>{formatPrice(totals.UAH ?? 0, 'UAH')}</span>
 											</span>
-											<span className='order-card__open'>
+											<span className='order-card__open' aria-hidden='true'>
 												<ArrowRight size={16} />
 											</span>
 										</button>

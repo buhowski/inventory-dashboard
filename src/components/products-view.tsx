@@ -3,7 +3,15 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChevronDown, ChevronRight, Monitor, SlidersHorizontal, Trash2 } from '@/components/icons';
+import {
+	ChevronDown,
+	ChevronRight,
+	Monitor,
+	RotateCcw,
+	SlidersHorizontal,
+	Trash2,
+	X,
+} from '@/components/icons';
 import { PageFeedback } from '@/components/ui/page-feedback';
 import { PageHeading } from '@/components/ui/page-heading';
 import {
@@ -13,7 +21,19 @@ import {
 	getProductSearchText,
 	matchesSearch,
 } from '@/lib/inventory';
-import { selectOrder, type AppDispatch, type RootState } from '@/lib/store';
+import {
+	deleteProduct,
+	loadInventory,
+	resetDeletedInventory,
+	selectOrder,
+	setSearchQuery,
+	type AppDispatch,
+	type RootState,
+} from '@/lib/store';
+import type { Product } from '@/lib/types';
+
+const deletedProductStorageKey = 'inventory.deletedProducts';
+const deletedOrderStorageKey = 'inventory.deletedOrders';
 
 // Filter and inspect catalog items.
 export function ProductsView() {
@@ -22,6 +42,8 @@ export function ProductsView() {
 	);
 	const dispatch = useDispatch<AppDispatch>();
 	const [selectedType, setSelectedType] = useState('All products');
+	const [pendingDelete, setPendingDelete] = useState<Product | null>(null);
+	const [actionError, setActionError] = useState<string | null>(null);
 	const types = useMemo(() => [...new Set(products.map(({ type }) => type))].sort(), [products]);
 	const visibleProducts = useMemo(
 		() =>
@@ -34,6 +56,47 @@ export function ProductsView() {
 			}),
 		[orders, products, searchQuery, selectedType],
 	);
+
+	const confirmDelete = () => {
+		if (!pendingDelete) return;
+		try {
+			const storedIds: unknown = JSON.parse(
+				window.localStorage.getItem(deletedProductStorageKey) ?? '[]',
+			);
+			const deletedIds = Array.isArray(storedIds)
+				? storedIds.filter((id): id is string => typeof id === 'string')
+				: [];
+			window.localStorage.setItem(
+				deletedProductStorageKey,
+				JSON.stringify([...new Set([...deletedIds, pendingDelete.id])]),
+			);
+			dispatch(deleteProduct(pendingDelete.id));
+			setPendingDelete(null);
+			setActionError(null);
+		} catch (error) {
+			console.error('Unable to save the deleted product.', error);
+			setActionError(
+				'This product could not be deleted. Check your browser storage and try again.',
+			);
+		}
+	};
+
+	const restoreDemoProducts = () => {
+		try {
+			window.localStorage.removeItem(deletedProductStorageKey);
+			window.localStorage.removeItem(deletedOrderStorageKey);
+			dispatch(resetDeletedInventory());
+			dispatch(setSearchQuery(''));
+			setSelectedType('All products');
+			setActionError(null);
+			void dispatch(loadInventory());
+		} catch (error) {
+			console.error('Unable to restore demo products.', error);
+			setActionError(
+				'Demo products could not be restored. Check your browser storage and try again.',
+			);
+		}
+	};
 
 	if (status === 'loading' || status === 'idle') {
 		return <PageFeedback kind='loading' message='Loading your products…' />;
@@ -167,9 +230,12 @@ export function ProductsView() {
 											<button
 												className='icon-button catalog__action'
 												type='button'
-												aria-label={`Remove ${product.title}`}
-												disabled
-												title='Product removal is not available in this demo'
+												aria-label={`Delete ${product.title}`}
+												title={`Delete ${product.title}`}
+												onClick={() => {
+													setActionError(null);
+													setPendingDelete(product);
+												}}
 											>
 												<Trash2 size={15} />
 											</button>
@@ -190,11 +256,51 @@ export function ProductsView() {
 			) : (
 				<div className='empty-state empty-state--catalog'>
 					<span className='empty-state__icon'>
-						<Monitor size={20} />
+						{products.length === 0 ? <RotateCcw size={20} /> : <Monitor size={20} />}
 					</span>
-					<strong>No products found</strong>
-					<span>Adjust the category filter or try a different search.</span>
+					<strong>{products.length === 0 ? 'No products left' : 'No products found'}</strong>
+					<span>
+						{products.length === 0
+							? 'The catalog is empty. Restore the demo inventory to start over.'
+							: 'Adjust the category filter or clear the search.'}
+					</span>
+					{products.length === 0 ? (
+						<button
+							className='button button--primary catalog__restore'
+							type='button'
+							onClick={restoreDemoProducts}
+						>
+							<RotateCcw size={14} /> Restore demo inventory
+						</button>
+					) : (
+						<button
+							className='button button--quiet catalog__clear-filters'
+							type='button'
+							onClick={() => {
+								setSelectedType('All products');
+								dispatch(setSearchQuery(''));
+							}}
+						>
+							Clear filters
+						</button>
+					)}
 				</div>
+			)}
+			{actionError && !pendingDelete && (
+				<p className='delete-dialog__error catalog__action-error' role='alert'>
+					{actionError}
+				</p>
+			)}
+			{pendingDelete && (
+				<ProductDeleteDialog
+					product={pendingDelete}
+					error={actionError}
+					onClose={() => {
+						setPendingDelete(null);
+						setActionError(null);
+					}}
+					onConfirm={confirmDelete}
+				/>
 			)}
 			<div className='catalog__note'>
 				<span>
@@ -203,5 +309,72 @@ export function ProductsView() {
 				<span>Synced just now</span>
 			</div>
 		</section>
+	);
+}
+
+function ProductDeleteDialog({
+	product,
+	error,
+	onClose,
+	onConfirm,
+}: {
+	product: Product;
+	error: string | null;
+	onClose: () => void;
+	onConfirm: () => void;
+}) {
+	return (
+		<div
+			className='dialog-overlay'
+			onMouseDown={(event) => {
+				if (event.target === event.currentTarget) onClose();
+			}}
+		>
+			<section
+				className='delete-dialog'
+				role='alertdialog'
+				aria-modal='true'
+				aria-labelledby='delete-product-title'
+			>
+				<button
+					className='icon-button delete-dialog__close'
+					type='button'
+					onClick={onClose}
+					aria-label='Close confirmation'
+				>
+					<X size={18} />
+				</button>
+				<div className='delete-dialog__icon'>
+					<Trash2 size={20} />
+				</div>
+				<p className='eyebrow'>PLEASE CONFIRM</p>
+				<h2 id='delete-product-title'>Delete this product?</h2>
+				<p className='delete-dialog__copy'>
+					This will remove <strong>{product.title}</strong> from the catalog and its order.
+				</p>
+				<div className='delete-dialog__products'>
+					<div className='delete-dialog__product'>
+						<span className='delete-dialog__product-indicator' />
+						<span>
+							<strong>{product.title}</strong>
+							<small>{product.serialNumber}</small>
+						</span>
+					</div>
+				</div>
+				{error && (
+					<p className='delete-dialog__error' role='alert'>
+						{error}
+					</p>
+				)}
+				<div className='delete-dialog__actions'>
+					<button className='button button--quiet' type='button' onClick={onClose}>
+						Cancel
+					</button>
+					<button className='button button--danger' type='button' onClick={onConfirm}>
+						<Trash2 size={15} /> Delete product
+					</button>
+				</div>
+			</section>
+		</div>
 	);
 }

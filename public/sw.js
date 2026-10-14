@@ -45,6 +45,10 @@ self.addEventListener('fetch', (event) => {
 	}
 
 	if (url.pathname.startsWith('/_next/static/')) {
+		if (self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1') {
+			return;
+		}
+
 		event.respondWith(
 			caches.open(CACHE_NAME).then(async (cache) => {
 				const cached = await cache.match(request);

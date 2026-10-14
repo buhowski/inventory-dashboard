@@ -7,11 +7,12 @@ A responsive inventory dashboard for reviewing incoming orders and their product
 - Orders and products pages with shared search and product-category filtering.
 - Expandable order details, currency totals, and confirmed order deletion.
 - Live date, time, and Socket.IO active-tab count.
-- Browser storage for deleted demo orders, lazy-loaded pages, and a PWA offline fallback.
+- Browser storage for deleted demo orders and products, with a restore action for the demo inventory.
+- Lazy-loaded pages and a PWA offline fallback.
 - BEM-named SCSS modules style the shared shell, orders, and catalog views; Tailwind CSS v4 provides the base layer and theme tokens.
 - MySQL schema and Docker Compose configuration for local infrastructure.
 
-> The REST API currently serves sample data in memory. MySQL is not connected to the application, so order deletions are stored only in the current browser. Docker Compose is included but has not been verified in this environment.
+> The REST API currently serves sample data in memory. MySQL is not connected to the application, so deletions are stored only in the current browser. Docker Compose and the app image have been verified locally.
 
 ## Styles
 

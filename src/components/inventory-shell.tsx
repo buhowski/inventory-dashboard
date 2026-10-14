@@ -40,10 +40,10 @@ export function InventoryShell({ children }: { children: ReactNode }) {
 			<aside className='sidebar'>
 				<div className='profile'>
 					<div className='profile__avatar' aria-hidden='true'>
-						JR
+						DR
 					</div>
 					<span className='profile__indicator' aria-label='Profile online' />
-					<span className='profile__name'>Jordan Reed</span>
+					<span className='profile__name'>Dr. Gonzo</span>
 					<span className='profile__role'>Inventory manager</span>
 				</div>
 
@@ -83,7 +83,7 @@ export function InventoryShell({ children }: { children: ReactNode }) {
 						</div>
 						<div className='workspace__copy'>
 							<span>Workspace</span>
-							<strong>Acme Studio</strong>
+							<strong>Hello World</strong>
 						</div>
 						<ArrowUpRight size={15} />
 					</div>

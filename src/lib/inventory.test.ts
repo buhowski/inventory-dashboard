@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { getOrderProducts, getOrderTotals, matchesSearch } from '@/lib/inventory';
-import { deleteOrder, loadInventory, makeStore, setDeletedOrderIds } from '@/lib/store';
+import {
+	deleteOrder,
+	deleteProduct,
+	loadInventory,
+	makeStore,
+	resetDeletedInventory,
+	setDeletedOrderIds,
+	setDeletedProductIds,
+} from '@/lib/store';
 import type { Order, Product } from '@/lib/types';
 
 const order: Order = {
@@ -84,5 +92,44 @@ describe('inventory state', () => {
 
 		expect(store.getState().inventory.orders).toEqual([]);
 		expect(store.getState().inventory.products).toEqual([]);
+	});
+
+	it('removes a deleted product from its order and recalculates its product list', () => {
+		const store = makeStore();
+		store.dispatch(
+			loadInventory.fulfilled({ orders: [order], products: sampleProducts }, 'request', undefined),
+		);
+
+		store.dispatch(deleteProduct('PRD-1'));
+
+		expect(store.getState().inventory.products.map(({ id }) => id)).toEqual(['PRD-2']);
+		expect(store.getState().inventory.orders[0].productIds).toEqual(['PRD-2']);
+		expect(getOrderProducts(store.getState().inventory.orders[0], store.getState().inventory.products))
+			.toHaveLength(1);
+	});
+
+	it('keeps deleted products hidden after inventory reload', () => {
+		const store = makeStore();
+		store.dispatch(setDeletedProductIds(['PRD-1']));
+		store.dispatch(
+			loadInventory.fulfilled({ orders: [order], products: sampleProducts }, 'request', undefined),
+		);
+
+		expect(store.getState().inventory.products.map(({ id }) => id)).toEqual(['PRD-2']);
+		expect(store.getState().inventory.orders[0].productIds).toEqual(['PRD-2']);
+	});
+
+	it('restores deleted orders and products when demo inventory is reset and reloaded', () => {
+		const store = makeStore();
+		store.dispatch(setDeletedProductIds(['PRD-1', 'PRD-2']));
+		store.dispatch(setDeletedOrderIds([order.id]));
+		store.dispatch(resetDeletedInventory());
+		store.dispatch(
+			loadInventory.fulfilled({ orders: [order], products: sampleProducts }, 'request', undefined),
+		);
+
+		expect(store.getState().inventory.products.map(({ id }) => id)).toEqual(['PRD-1', 'PRD-2']);
+		expect(store.getState().inventory.orders[0].productIds).toEqual(['PRD-1', 'PRD-2']);
+		expect(store.getState().inventory.deletedOrderIds).toEqual([]);
 	});
 });

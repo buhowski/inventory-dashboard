@@ -12,6 +12,7 @@ interface InventoryState {
 	orders: Order[];
 	products: Product[];
 	deletedOrderIds: string[];
+	deletedProductIds: string[];
 	searchQuery: string;
 	selectedOrderId: string | null;
 	status: 'idle' | 'loading' | 'ready' | 'failed';
@@ -22,6 +23,7 @@ const initialState: InventoryState = {
 	orders: [],
 	products: [],
 	deletedOrderIds: [],
+	deletedProductIds: [],
 	searchQuery: '',
 	selectedOrderId: null,
 	status: 'idle',
@@ -65,11 +67,36 @@ const inventorySlice = createSlice({
 				(product) => !action.payload.includes(product.orderId),
 			);
 		},
+		setDeletedProductIds(state, action: PayloadAction<string[]>) {
+			state.deletedProductIds = [...new Set(action.payload)];
+			state.products = state.products.filter(
+				(product) => !state.deletedProductIds.includes(product.id),
+			);
+			state.orders = state.orders.map((order) => ({
+				...order,
+				productIds: order.productIds.filter(
+					(productId) => !state.deletedProductIds.includes(productId),
+				),
+			}));
+		},
 		deleteOrder(state, action: PayloadAction<string>) {
 			state.deletedOrderIds = [...new Set([...state.deletedOrderIds, action.payload])];
 			state.orders = state.orders.filter((order) => order.id !== action.payload);
 			state.products = state.products.filter((product) => product.orderId !== action.payload);
 			if (state.selectedOrderId === action.payload) state.selectedOrderId = null;
+		},
+		deleteProduct(state, action: PayloadAction<string>) {
+			state.deletedProductIds = [...new Set([...state.deletedProductIds, action.payload])];
+			state.products = state.products.filter((product) => product.id !== action.payload);
+			state.orders = state.orders.map((order) => ({
+				...order,
+				productIds: order.productIds.filter((productId) => productId !== action.payload),
+			}));
+		},
+		resetDeletedInventory(state) {
+			state.deletedProductIds = [];
+			state.deletedOrderIds = [];
+			state.selectedOrderId = null;
 		},
 	},
 	extraReducers(builder) {
@@ -83,8 +110,15 @@ const inventorySlice = createSlice({
 					(order) => !state.deletedOrderIds.includes(order.id),
 				);
 				state.products = action.payload.products.filter(
-					(product) => !state.deletedOrderIds.includes(product.orderId),
+					(product) =>
+						!state.deletedOrderIds.includes(product.orderId) &&
+						!state.deletedProductIds.includes(product.id),
 				);
+				const productIds = new Set(state.products.map((product) => product.id));
+				state.orders = state.orders.map((order) => ({
+					...order,
+					productIds: order.productIds.filter((productId) => productIds.has(productId)),
+				}));
 				state.status = 'ready';
 			})
 			.addCase(loadInventory.rejected, (state, action) => {
@@ -98,8 +132,15 @@ const inventorySlice = createSlice({
 });
 
 // Export typed Redux helpers.
-export const { deleteOrder, selectOrder, setDeletedOrderIds, setSearchQuery } =
-	inventorySlice.actions;
+export const {
+	deleteOrder,
+	deleteProduct,
+	resetDeletedInventory,
+	selectOrder,
+	setDeletedOrderIds,
+	setDeletedProductIds,
+	setSearchQuery,
+} = inventorySlice.actions;
 
 // Create the browser Redux store.
 export const makeStore = () =>
