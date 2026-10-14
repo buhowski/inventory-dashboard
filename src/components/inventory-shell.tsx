@@ -31,9 +31,12 @@ export function InventoryShell({ children }: { children: ReactNode }) {
 					<span className='brand__mark'>
 						<ShieldCheck size={19} strokeWidth={2.3} />
 					</span>
+
 					<span className='brand__word'>STOCKROOM</span>
 				</Link>
+
 				<SearchBar />
+
 				<LiveStatus />
 			</header>
 
@@ -42,12 +45,16 @@ export function InventoryShell({ children }: { children: ReactNode }) {
 					<div className='profile__avatar' aria-hidden='true'>
 						DR
 					</div>
+
 					<span className='profile__indicator' aria-label='Profile online' />
+
 					<span className='profile__name'>Dr. Gonzo</span>
+
 					<span className='profile__role'>Inventory manager</span>
 				</div>
 
 				<p className='nav__label'>WORKSPACE</p>
+
 				<nav className='nav' aria-label='Main navigation'>
 					{navigation.map(({ href, label, icon: Icon }) => (
 						<Link
@@ -57,6 +64,7 @@ export function InventoryShell({ children }: { children: ReactNode }) {
 							key={href}
 						>
 							<Icon size={17} />
+
 							<span>{label}</span>
 							{pathname === href && <span className='nav__active-dot' />}
 						</Link>
@@ -64,14 +72,19 @@ export function InventoryShell({ children }: { children: ReactNode }) {
 				</nav>
 
 				<p className='nav__label nav__label--secondary'>MANAGE</p>
+
 				<nav className='nav' aria-label='Management'>
 					<div className='nav__item nav__item--disabled' aria-disabled='true'>
 						<Box size={17} />
+
 						<span>Groups</span>
+
 						<span className='nav__soon'>Soon</span>
 					</div>
+
 					<div className='nav__item nav__item--disabled' aria-disabled='true'>
 						<Settings size={17} />
+
 						<span>Settings</span>
 					</div>
 				</nav>
@@ -81,15 +94,21 @@ export function InventoryShell({ children }: { children: ReactNode }) {
 						<div className='workspace__icon'>
 							<Box size={16} />
 						</div>
+
 						<div className='workspace__copy'>
 							<span>Workspace</span>
+
 							<strong>Hello World</strong>
 						</div>
+
 						<ArrowUpRight size={15} />
 					</div>
+
 					<div className='sidebar__footer'>
 						<CircleHelp size={15} />
+
 						<span>Help center</span>
+
 						<span className='sidebar__shortcut'>?</span>
 					</div>
 				</div>
@@ -101,8 +120,10 @@ export function InventoryShell({ children }: { children: ReactNode }) {
 						<span className='brand__mark'>
 							<ShieldCheck size={18} />
 						</span>
+
 						<span className='brand__word'>STOCKROOM</span>
 					</Link>
+
 					<span>
 						<ShoppingBag size={16} /> Inventory
 					</span>

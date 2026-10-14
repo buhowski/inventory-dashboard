@@ -28,6 +28,7 @@ export function SearchBar() {
 	return (
 		<label className='search'>
 			<Search size={17} aria-hidden='true' />
+
 			<input
 				ref={inputRef}
 				type='search'

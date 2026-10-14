@@ -46,6 +46,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 				>
 					<Providers>
 						<PwaRegistration />
+
 						<InventoryShell>{children}</InventoryShell>
 					</Providers>
 				</Suspense>

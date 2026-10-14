@@ -43,6 +43,7 @@ export function LiveStatus() {
 							}).format(now)
 						: 'Loading date'}
 				</span>
+
 				<span className='live-status__time'>
 					<Clock3 size={14} />
 					{now
@@ -54,11 +55,14 @@ export function LiveStatus() {
 						: '--:--:--'}
 				</span>
 			</div>
+
 			<div className='presence' title='Connected browser tabs'>
 				<span
 					className={`presence__light${activeTabs === null ? ' presence__light--offline' : ''}`}
 				/>
+
 				<Zap size={14} />
+
 				<span>{activeTabs === null ? 'Offline' : `${activeTabs} active`}</span>
 			</div>
 		</div>

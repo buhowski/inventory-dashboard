@@ -10,6 +10,7 @@ import {
 	Clock3,
 	List,
 	Plus,
+	RotateCcw,
 	Trash2,
 	X,
 } from '@/components/icons';
@@ -17,6 +18,8 @@ import { MetricCard } from '@/components/ui/metric-card';
 import { PageFeedback } from '@/components/ui/page-feedback';
 import { PageHeading } from '@/components/ui/page-heading';
 import { ProductThumbnail } from '@/components/ui/product-thumbnail';
+import { CatalogRestoreButton } from '@/components/ui/catalog-restore-button';
+import { DeleteConfirmationDialog } from '@/components/ui/delete-confirmation-dialog';
 import {
 	formatCompactDate,
 	formatDate,
@@ -26,10 +29,19 @@ import {
 	getOrderTotals,
 	matchesSearch,
 } from '@/lib/inventory';
-import { deleteOrder, selectOrder, type AppDispatch, type RootState } from '@/lib/store';
+import {
+	deleteOrder,
+	loadInventory,
+	resetDeletedInventory,
+	selectOrder,
+	setSearchQuery,
+	type AppDispatch,
+	type RootState,
+} from '@/lib/store';
 import type { Order } from '@/lib/types';
 
 const storageKey = 'inventory.deletedOrders';
+const deletedProductStorageKey = 'inventory.deletedProducts';
 
 // Show and manage incoming receipts.
 export function OrdersView() {
@@ -39,6 +51,7 @@ export function OrdersView() {
 	);
 	const [pendingDelete, setPendingDelete] = useState<Order | null>(null);
 	const [deleteError, setDeleteError] = useState<string | null>(null);
+	const [restoreError, setRestoreError] = useState<string | null>(null);
 
 	const visibleOrders = useMemo(
 		() => orders.filter((order) => matchesSearch(getOrderSearchText(order), searchQuery)),
@@ -47,6 +60,22 @@ export function OrdersView() {
 	const selectedOrder = orders.find((order) => order.id === selectedOrderId) ?? null;
 	const totalUnits = orders.reduce((total, order) => total + order.productIds.length, 0);
 	const uniqueTypes = new Set(products.map(({ type }) => type)).size;
+
+	const restoreDemoInventory = () => {
+		try {
+			window.localStorage.removeItem(deletedProductStorageKey);
+			window.localStorage.removeItem(storageKey);
+			dispatch(resetDeletedInventory());
+			dispatch(setSearchQuery(''));
+			setRestoreError(null);
+			void dispatch(loadInventory());
+		} catch (caughtError) {
+			console.error('Unable to restore demo inventory.', caughtError);
+			setRestoreError(
+				'Demo inventory could not be restored. Check your browser storage and try again.',
+			);
+		}
+	};
 
 	// Save deletions for the next visit.
 	const confirmDelete = () => {
@@ -108,6 +137,7 @@ export function OrdersView() {
 					note='Live'
 					noteTone='trend'
 				/>
+
 				<MetricCard
 					icon={<Box size={17} />}
 					tone='blue'
@@ -116,6 +146,7 @@ export function OrdersView() {
 					note='across all orders'
 					noteTone='caption'
 				/>
+
 				<MetricCard
 					icon={<Clock3 size={17} />}
 					tone='purple'
@@ -133,8 +164,10 @@ export function OrdersView() {
 							<h2>
 								Recent orders <span>{visibleOrders.length}</span>
 							</h2>
+
 							<p>Select a receipt to inspect its products</p>
 						</div>
+
 						<button className='orders__filter' type='button' disabled>
 							<CalendarDays size={15} /> All time <ChevronRight size={14} />
 						</button>
@@ -162,27 +195,35 @@ export function OrdersView() {
 											>
 												0{index + 1}
 											</span>
+
 											<span className='order-card__copy'>
 												<span className='order-card__title'>{order.title}</span>
+
 												<span className='order-card__id'>
 													{order.id} <span className='order-card__separator'>·</span>{' '}
 													{orderProducts.length} products
 												</span>
 											</span>
+
 											<span className='order-card__meta'>
 												<span className='order-card__date--short'>
 													{formatCompactDate(order.date)}
 												</span>
+
 												<span className='order-card__date--long'>{formatDate(order.date)}</span>
 											</span>
+
 											<span className='order-card__total'>
 												<strong>{formatPrice(totals.USD ?? 0, 'USD')}</strong>
+
 												<span>{formatPrice(totals.UAH ?? 0, 'UAH')}</span>
 											</span>
+
 											<span className='order-card__open' aria-hidden='true'>
 												<ArrowRight size={16} />
 											</span>
 										</button>
+
 										<button
 											className='icon-button order-card__delete'
 											type='button'
@@ -201,11 +242,23 @@ export function OrdersView() {
 					) : (
 						<div className='empty-state'>
 							<span className='empty-state__icon'>
-								<List size={20} />
+								{orders.length === 0 ? <RotateCcw size={20} /> : <List size={20} />}
 							</span>
-							<strong>No matching orders</strong>
-							<span>Try another search term or clear the search.</span>
+
+							<strong>{orders.length === 0 ? 'No orders left' : 'No matching orders'}</strong>
+
+							<span>
+								{orders.length === 0
+									? 'There are no orders left. Restore the demo inventory to start over.'
+									: 'Try another search term or clear the search.'}
+							</span>
+							{orders.length === 0 && <CatalogRestoreButton onClick={restoreDemoInventory} />}
 						</div>
+					)}
+					{restoreError && (
+						<p className='delete-dialog__error catalog__action-error' role='alert'>
+							{restoreError}
+						</p>
 					)}
 					<div className='orders__footnote'>
 						<span className='orders__footnote-dot' />
@@ -263,6 +316,7 @@ function OrderDetails({
 					<span className='eyebrow__dot' />
 					RECEIPT DETAILS
 				</div>
+
 				<button
 					className='icon-button order-details__close'
 					type='button'
@@ -271,44 +325,59 @@ function OrderDetails({
 				>
 					<X size={17} />
 				</button>
+
 				<h2>{order.title}</h2>
+
 				<p className='order-details__description'>{order.description}</p>
+
 				<div className='order-details__date'>
 					<CalendarDays size={14} /> Received {formatDate(order.date)}
 				</div>
 			</div>
+
 			<div className='order-details__summary'>
 				<div>
 					<span>ITEMS</span>
+
 					<strong>{products.length.toString().padStart(2, '0')}</strong>
 				</div>
+
 				<div>
 					<span>ORDER TOTAL</span>
+
 					<strong>{formatPrice(totals.USD ?? 0, 'USD')}</strong>
 				</div>
 			</div>
+
 			<div className='order-details__products-heading'>
 				<h3>Included products</h3>
+
 				<span>{products.length}</span>
 			</div>
+
 			<div className='order-details__products'>
 				{products.map((product) => (
 					<div className='order-details__product' key={product.id}>
 						<ProductThumbnail />
+
 						<div className='order-details__product-copy'>
 							<strong>{product.title}</strong>
+
 							<span>{product.serialNumber}</span>
 						</div>
+
 						<span
 							className={`order-details__status-dot ${product.status === 'Available' ? 'order-details__status-dot--available' : 'order-details__status-dot--repair'}`}
 						/>
 					</div>
 				))}
 			</div>
+
 			<div className='order-details__footer'>
 				<span>
 					<span className='order-details__footer-dot' /> All items accounted for
 				</span>
+
 				<button className='text-button text-button--danger' type='button' onClick={onDelete}>
 					<Trash2 size={14} /> Delete order
 				</button>
@@ -332,41 +401,25 @@ function DeleteDialog({
 	onConfirm: () => void;
 }) {
 	return (
-		<div
-			className='dialog-overlay'
-			onMouseDown={(event) => {
-				if (event.target === event.currentTarget) onClose();
-			}}
-		>
-			<section
-				className='delete-dialog'
-				role='alertdialog'
-				aria-modal='true'
-				aria-labelledby='delete-title'
-			>
-				<button
-					className='icon-button delete-dialog__close'
-					type='button'
-					onClick={onClose}
-					aria-label='Close confirmation'
-				>
-					<X size={18} />
-				</button>
-				<div className='delete-dialog__icon'>
-					<Trash2 size={20} />
-				</div>
-				<p className='eyebrow'>PLEASE CONFIRM</p>
-				<h2 id='delete-title'>Delete this order?</h2>
-				<p className='delete-dialog__copy'>
+		<DeleteConfirmationDialog
+			titleId='delete-title'
+			title='Delete this order?'
+			description={
+				<>
 					This will remove <strong>{order.title}</strong> and its receipt from your orders list.
-				</p>
-				<div className='delete-dialog__products'>
+				</>
+			}
+			details={
+				<>
 					{products.slice(0, 2).map((product) => (
 						<div className='delete-dialog__product' key={product.id}>
 							<span className='delete-dialog__product-indicator' />
+
 							<ProductThumbnail />
+
 							<span>
 								<strong>{product.title}</strong>
+
 								<small>{product.serialNumber}</small>
 							</span>
 						</div>
@@ -374,21 +427,13 @@ function DeleteDialog({
 					{products.length > 2 && (
 						<span className='delete-dialog__more-products'>+ {products.length - 2} more items</span>
 					)}
-				</div>
-				{error && (
-					<p className='delete-dialog__error' role='alert'>
-						{error}
-					</p>
-				)}
-				<div className='delete-dialog__actions'>
-					<button className='button button--quiet' type='button' onClick={onClose}>
-						Keep order
-					</button>
-					<button className='button button--danger' type='button' onClick={onConfirm}>
-						<Trash2 size={15} /> Delete order
-					</button>
-				</div>
-			</section>
-		</div>
+				</>
+			}
+			error={error}
+			cancelLabel='Keep order'
+			confirmLabel='Delete order'
+			onClose={onClose}
+			onConfirm={onConfirm}
+		/>
 	);
 }

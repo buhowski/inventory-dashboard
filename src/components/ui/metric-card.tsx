@@ -14,10 +14,13 @@ export function MetricCard({ icon, tone, label, value, note, noteTone }: MetricC
 	return (
 		<div className='overview__card'>
 			<span className={`overview__icon overview__icon--${tone}`}>{icon}</span>
+
 			<div>
 				<span className='overview__label'>{label}</span>
+
 				<strong>{value}</strong>
 			</div>
+
 			<span className={`overview__${noteTone}`}>{note}</span>
 		</div>
 	);

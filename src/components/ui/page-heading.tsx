@@ -27,9 +27,11 @@ export function PageHeading({
 					<span className='eyebrow__dot' aria-hidden='true' />
 					{eyebrow}
 				</div>
+
 				<h1>
 					{title} <span className='page__count'>{count}</span>
 				</h1>
+
 				<p className='page__description'>{description}</p>
 			</div>
 			{action}
