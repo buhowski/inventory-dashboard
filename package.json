@@ -5,11 +5,11 @@
 	"scripts": {
 		"dev": "next dev --hostname 0.0.0.0",
 		"dev:socket": "tsx watch server/socket.ts",
-		"dev:all": "concurrently -k \"yarn:dev\" \"yarn:dev:socket\"",
+		"dev:all": "concurrently -k \"next dev --hostname 0.0.0.0\" \"tsx watch server/socket.ts\"",
 		"build": "next build",
 		"start": "next start --hostname 0.0.0.0",
 		"start:socket": "tsx server/socket.ts",
-		"start:all": "concurrently -k \"yarn:start\" \"yarn:start:socket\"",
+		"start:all": "concurrently -k \"next start --hostname 0.0.0.0\" \"tsx server/socket.ts\"",
 		"lint": "eslint",
 		"typecheck": "tsc --noEmit",
 		"test": "vitest run",

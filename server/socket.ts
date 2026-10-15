@@ -4,7 +4,6 @@ import { Server } from 'socket.io';
 const port = Number(process.env.SOCKET_PORT ?? 3001);
 const allowedOrigin = process.env.APP_ORIGIN ?? 'http://localhost:3000';
 
-// Publish the live connection count.
 const httpServer = createServer((request, response) => {
 	if (request.url === '/healthz') {
 		response.writeHead(200, { 'content-type': 'application/json' });
@@ -16,7 +15,6 @@ const httpServer = createServer((request, response) => {
 	response.end('Not found');
 });
 
-// Broadcast presence to every connected tab.
 const io = new Server(httpServer, {
 	cors: { origin: allowedOrigin, methods: ['GET', 'POST'] },
 });
@@ -24,6 +22,7 @@ const io = new Server(httpServer, {
 io.on('connection', (socket) => {
 	const publishActiveCount = () => io.emit('active-count', io.engine.clientsCount);
 
+	// Keep every connected tab in sync
 	publishActiveCount();
 	socket.on('disconnect', publishActiveCount);
 });
@@ -32,7 +31,6 @@ httpServer.listen(port, '0.0.0.0', () => {
 	console.info(`Socket presence listening on port ${port}.`);
 });
 
-// Close cleanly during shutdown.
 const shutdown = () => {
 	io.close(() => {
 		process.exit(0);

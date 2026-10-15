@@ -1,4 +1,3 @@
-// Style the shared application shell.
 @use 'shared' as *;
 
 .app {
@@ -10,7 +9,6 @@
 	&__main {
 		min-height: calc(100vh - 72px);
 		margin-left: 232px;
-		padding: 39px clamp(26px, 4vw, 72px) 48px;
 	}
 
 	// .app__mobile-brand
@@ -192,7 +190,8 @@
 
 		box-shadow: 0 0 0 3px rgb(128 189 67 / 13%);
 
-		&.presence__light--offline {
+		// .presence__light--offline
+		&--offline {
 			background: #d2a14d;
 			box-shadow: 0 0 0 3px rgb(210 161 77 / 13%);
 		}
@@ -217,16 +216,6 @@
 	// .sidebar__bottom
 	&__bottom {
 		margin-top: auto;
-	}
-
-	// .sidebar__footer
-	&__footer {
-		display: flex;
-		align-items: center;
-		gap: 9px;
-		padding: 17px 7px 1px;
-		color: #839198;
-		font-size: 11px;
 	}
 
 	// .sidebar__shortcut
@@ -302,7 +291,7 @@
 
 	// .nav__label--secondary
 	&__label--secondary {
-		margin-top: 27px;
+		margin-top: 30px;
 	}
 	display: grid;
 	gap: 3px;
@@ -328,14 +317,15 @@
 			color: #40545e;
 		}
 
-		&.nav__item--active {
+		// .nav__item--active
+		&--active {
 			background: #f0f7e9;
 			color: #578e31;
 			font-weight: 650;
-		}
 
-		&.nav__item--active svg {
-			color: #6ba83e;
+			svg {
+				color: #6ba83e;
+			}
 		}
 	}
 
@@ -352,12 +342,11 @@
 	&__item--disabled {
 		color: #a5b0b5;
 		cursor: default;
-	}
 
-	// .nav__item--disabled
-	&__item--disabled:hover {
-		background: transparent;
-		color: #a5b0b5;
+		&:hover {
+			background: transparent;
+			color: #a5b0b5;
+		}
 	}
 
 	// .nav__soon
@@ -396,15 +385,14 @@
 		gap: 3px;
 		color: #92a0a7;
 		font-size: 9px;
+
+		strong {
+			color: #354750;
+			font-size: 11px;
+		}
 	}
 
-	// .workspace__copy
-	&__copy strong {
-		color: #354750;
-		font-size: 11px;
+	> svg {
+		color: #9eacb2;
 	}
-}
-
-.workspace > svg {
-	color: #9eacb2;
 }

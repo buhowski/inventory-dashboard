@@ -2,12 +2,12 @@
 
 import { useEffect } from 'react';
 
-// Register offline app support in production only.
 export function PwaRegistration() {
 	useEffect(() => {
 		if (!('serviceWorker' in navigator)) return;
 
 		if (process.env.NODE_ENV !== 'production') {
+			// Remove stale app workers from development
 			const appWorkerUrl = new URL('/sw.js', window.location.origin).href;
 			const isControlledByAppWorker =
 				navigator.serviceWorker.controller?.scriptURL === appWorkerUrl;

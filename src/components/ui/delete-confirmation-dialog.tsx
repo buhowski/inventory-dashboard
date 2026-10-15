@@ -27,7 +27,12 @@ export function DeleteConfirmationDialog({
 }: DeleteConfirmationDialogProps) {
 	return (
 		<DialogOverlay onClose={onClose}>
-			<section className='delete-dialog' role='alertdialog' aria-modal='true' aria-labelledby={titleId}>
+			<section
+				className='delete-dialog'
+				role='alertdialog'
+				aria-modal='true'
+				aria-labelledby={titleId}
+			>
 				<button
 					className='icon-button delete-dialog__close'
 					type='button'

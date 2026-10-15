@@ -4,24 +4,22 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      APP_ORIGIN: http://localhost:3000
-      NEXT_PUBLIC_SOCKET_URL: http://localhost:3001
+      APP_ORIGIN: ${APP_ORIGIN:-http://localhost:3000}
       SOCKET_PORT: 3001
     ports:
       - '3000:3000'
       - '3001:3001'
-    depends_on:
-      mysql:
-        condition: service_healthy
     restart: unless-stopped
 
   mysql:
+    profiles:
+      - demo-db
     image: mysql:8.4
     environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE:?Set MYSQL_DATABASE in your local environment}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in your local environment}
-      MYSQL_USER: ${MYSQL_USER:?Set MYSQL_USER in your local environment}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in your local environment}
+      MYSQL_DATABASE: stockroom
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-local-demo-root}
+      MYSQL_USER: ${MYSQL_USER:-stockroom_app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-local-demo-app}
     ports:
       - '3306:3306'
     volumes:

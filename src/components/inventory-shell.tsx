@@ -3,15 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
-import {
-	ArrowUpRight,
-	Box,
-	CircleHelp,
-	Package,
-	Settings,
-	ShieldCheck,
-	ShoppingBag,
-} from '@/components/icons';
+import { Box, Package, Settings, ShieldCheck, ShoppingBag } from '@/components/icons';
 import { LiveStatus } from '@/components/live-status';
 import { SearchBar } from '@/components/search-bar';
 
@@ -20,7 +12,6 @@ const navigation = [
 	{ href: '/products', label: 'Products', icon: Package },
 ];
 
-// the shared application frame.
 export function InventoryShell({ children }: { children: ReactNode }) {
 	const pathname = usePathname();
 
@@ -75,17 +66,11 @@ export function InventoryShell({ children }: { children: ReactNode }) {
 
 				<nav className='nav' aria-label='Management'>
 					<div className='nav__item nav__item--disabled' aria-disabled='true'>
-						<Box size={17} />
-
-						<span>Groups</span>
-
-						<span className='nav__soon'>Soon</span>
-					</div>
-
-					<div className='nav__item nav__item--disabled' aria-disabled='true'>
 						<Settings size={17} />
 
 						<span>Settings</span>
+
+						<span className='nav__soon'>Soon</span>
 					</div>
 				</nav>
 
@@ -100,16 +85,6 @@ export function InventoryShell({ children }: { children: ReactNode }) {
 
 							<strong>Hello World</strong>
 						</div>
-
-						<ArrowUpRight size={15} />
-					</div>
-
-					<div className='sidebar__footer'>
-						<CircleHelp size={15} />
-
-						<span>Help center</span>
-
-						<span className='sidebar__shortcut'>?</span>
 					</div>
 				</div>
 			</aside>

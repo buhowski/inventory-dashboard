@@ -16,6 +16,11 @@ import { PageHeading } from '@/components/ui/page-heading';
 import { DeleteConfirmationDialog } from '@/components/ui/delete-confirmation-dialog';
 import { CatalogRestoreButton } from '@/components/ui/catalog-restore-button';
 import {
+	clearDeletedInventory,
+	deletedProductStorageKey,
+	persistDeletedId,
+} from '@/lib/deleted-inventory';
+import {
 	formatCompactDate,
 	formatDate,
 	formatPrice,
@@ -33,10 +38,6 @@ import {
 } from '@/lib/store';
 import type { Product } from '@/lib/types';
 
-const deletedProductStorageKey = 'inventory.deletedProducts';
-const deletedOrderStorageKey = 'inventory.deletedOrders';
-
-// Filter and inspect catalog items.
 export function ProductsView() {
 	const { orders, products, searchQuery, status, error } = useSelector(
 		(state: RootState) => state.inventory,
@@ -46,31 +47,23 @@ export function ProductsView() {
 	const [pendingDelete, setPendingDelete] = useState<Product | null>(null);
 	const [actionError, setActionError] = useState<string | null>(null);
 	const types = useMemo(() => [...new Set(products.map(({ type }) => type))].sort(), [products]);
+	const ordersById = useMemo(() => new Map(orders.map((order) => [order.id, order])), [orders]);
 	const visibleProducts = useMemo(
 		() =>
 			products.filter((product) => {
-				const order = orders.find(({ id }) => id === product.orderId);
+				const order = ordersById.get(product.orderId);
 				return (
 					(selectedType === 'All products' || product.type === selectedType) &&
 					matchesSearch(getProductSearchText(product, order), searchQuery)
 				);
 			}),
-		[orders, products, searchQuery, selectedType],
+		[ordersById, products, searchQuery, selectedType],
 	);
 
 	const confirmDelete = () => {
 		if (!pendingDelete) return;
 		try {
-			const storedIds: unknown = JSON.parse(
-				window.localStorage.getItem(deletedProductStorageKey) ?? '[]',
-			);
-			const deletedIds = Array.isArray(storedIds)
-				? storedIds.filter((id): id is string => typeof id === 'string')
-				: [];
-			window.localStorage.setItem(
-				deletedProductStorageKey,
-				JSON.stringify([...new Set([...deletedIds, pendingDelete.id])]),
-			);
+			persistDeletedId(window.localStorage, deletedProductStorageKey, pendingDelete.id);
 			dispatch(deleteProduct(pendingDelete.id));
 			setPendingDelete(null);
 			setActionError(null);
@@ -84,8 +77,7 @@ export function ProductsView() {
 
 	const restoreDemoProducts = () => {
 		try {
-			window.localStorage.removeItem(deletedProductStorageKey);
-			window.localStorage.removeItem(deletedOrderStorageKey);
+			clearDeletedInventory(window.localStorage);
 			dispatch(resetDeletedInventory());
 			dispatch(setSearchQuery(''));
 			setSelectedType('All products');
@@ -118,12 +110,12 @@ export function ProductsView() {
 					<label className='catalog__filter'>
 						<SlidersHorizontal size={15} />
 
-						<span>Category</span>
+						<span>Type</span>
 
 						<select
 							value={selectedType}
 							onChange={(event) => setSelectedType(event.target.value)}
-							aria-label='Filter products by category'
+							aria-label='Filter products by type'
 						>
 							<option>All products</option>
 							{types.map((type) => (
@@ -141,10 +133,6 @@ export function ProductsView() {
 					<span className='catalog__toolbar-dot' /> ALL STOCK{' '}
 					<span>{visibleProducts.length} ITEMS</span>
 				</div>
-
-				<button className='catalog__sort' type='button' disabled>
-					Most recent <ChevronDown size={14} />
-				</button>
 			</div>
 
 			{visibleProducts.length ? (
@@ -172,7 +160,7 @@ export function ProductsView() {
 
 						<tbody>
 							{visibleProducts.map((product, index) => {
-								const order = orders.find(({ id }) => id === product.orderId);
+								const order = ordersById.get(product.orderId);
 								return (
 									<tr key={product.id} style={{ animationDelay: `${index * 45}ms` }}>
 										<td>
@@ -287,7 +275,7 @@ export function ProductsView() {
 					<span>
 						{products.length === 0
 							? 'The catalog is empty. Restore the demo inventory to start over.'
-							: 'Adjust the category filter or clear the search.'}
+							: 'Adjust the type filter or clear the search.'}
 					</span>
 					{products.length === 0 ? (
 						<CatalogRestoreButton onClick={restoreDemoProducts} />

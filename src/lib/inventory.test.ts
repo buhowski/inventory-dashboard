@@ -52,7 +52,6 @@ const sampleProducts: Product[] = [
 	},
 ];
 
-// Verify receipt totals and relationships.
 describe('inventory helpers', () => {
 	it('sums receipt values independently by currency', () => {
 		expect(getOrderTotals(sampleProducts)).toEqual({ USD: 150, UAH: 6000 });
@@ -69,7 +68,6 @@ describe('inventory helpers', () => {
 	});
 });
 
-// Keep receipt deletion consistent.
 describe('inventory state', () => {
 	it('removes receipt products when an order is deleted', () => {
 		const store = makeStore();
@@ -104,8 +102,9 @@ describe('inventory state', () => {
 
 		expect(store.getState().inventory.products.map(({ id }) => id)).toEqual(['PRD-2']);
 		expect(store.getState().inventory.orders[0].productIds).toEqual(['PRD-2']);
-		expect(getOrderProducts(store.getState().inventory.orders[0], store.getState().inventory.products))
-			.toHaveLength(1);
+		expect(
+			getOrderProducts(store.getState().inventory.orders[0], store.getState().inventory.products),
+		).toHaveLength(1);
 	});
 
 	it('keeps deleted products hidden after inventory reload', () => {

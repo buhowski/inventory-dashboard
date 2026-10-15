@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { io, type Socket } from 'socket.io-client';
 import { Clock3, Zap } from '@/components/icons';
 
-// Show live time and connected tabs.
 export function LiveStatus() {
 	const [now, setNow] = useState<Date | null>(null);
 	const [activeTabs, setActiveTabs] = useState<number | null>(null);

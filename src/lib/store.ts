@@ -30,7 +30,6 @@ const initialState: InventoryState = {
 	error: null,
 };
 
-// Fetch both dashboard datasets.
 export const loadInventory = createAsyncThunk('inventory/load', async (_, { rejectWithValue }) => {
 	const [ordersResponse, productsResponse] = await Promise.all([
 		fetch('/api/orders', { cache: 'no-store' }),
@@ -49,7 +48,6 @@ export const loadInventory = createAsyncThunk('inventory/load', async (_, { reje
 	return { orders, products };
 });
 
-// Keep shared dashboard state.
 const inventorySlice = createSlice({
 	name: 'inventory',
 	initialState,
@@ -105,6 +103,7 @@ const inventorySlice = createSlice({
 				state.status = 'loading';
 				state.error = null;
 			})
+			// Reapply local deletions and sync each order's product IDs
 			.addCase(loadInventory.fulfilled, (state, action) => {
 				state.orders = action.payload.orders.filter(
 					(order) => !state.deletedOrderIds.includes(order.id),
@@ -131,7 +130,6 @@ const inventorySlice = createSlice({
 	},
 });
 
-// Export typed Redux helpers.
 export const {
 	deleteOrder,
 	deleteProduct,
@@ -142,7 +140,6 @@ export const {
 	setSearchQuery,
 } = inventorySlice.actions;
 
-// Create the browser Redux store.
 export const makeStore = () =>
 	configureStore({
 		reducer: { inventory: inventorySlice.reducer },

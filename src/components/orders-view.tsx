@@ -6,7 +6,6 @@ import {
 	ArrowRight,
 	Box,
 	CalendarDays,
-	ChevronRight,
 	Clock3,
 	List,
 	Plus,
@@ -21,6 +20,12 @@ import { ProductThumbnail } from '@/components/ui/product-thumbnail';
 import { CatalogRestoreButton } from '@/components/ui/catalog-restore-button';
 import { DeleteConfirmationDialog } from '@/components/ui/delete-confirmation-dialog';
 import {
+	clearDeletedInventory,
+	deletedOrderStorageKey,
+	deletedProductStorageKey,
+	persistDeletedId,
+} from '@/lib/deleted-inventory';
+import {
 	formatCompactDate,
 	formatDate,
 	formatPrice,
@@ -31,6 +36,7 @@ import {
 } from '@/lib/inventory';
 import {
 	deleteOrder,
+	deleteProduct,
 	loadInventory,
 	resetDeletedInventory,
 	selectOrder,
@@ -38,12 +44,8 @@ import {
 	type AppDispatch,
 	type RootState,
 } from '@/lib/store';
-import type { Order } from '@/lib/types';
+import type { Order, Product } from '@/lib/types';
 
-const storageKey = 'inventory.deletedOrders';
-const deletedProductStorageKey = 'inventory.deletedProducts';
-
-// Show and manage incoming receipts.
 export function OrdersView() {
 	const dispatch = useDispatch<AppDispatch>();
 	const { orders, products, searchQuery, selectedOrderId, status, error } = useSelector(
@@ -51,6 +53,8 @@ export function OrdersView() {
 	);
 	const [pendingDelete, setPendingDelete] = useState<Order | null>(null);
 	const [deleteError, setDeleteError] = useState<string | null>(null);
+	const [pendingProductDelete, setPendingProductDelete] = useState<Product | null>(null);
+	const [productDeleteError, setProductDeleteError] = useState<string | null>(null);
 	const [restoreError, setRestoreError] = useState<string | null>(null);
 
 	const visibleOrders = useMemo(
@@ -63,8 +67,7 @@ export function OrdersView() {
 
 	const restoreDemoInventory = () => {
 		try {
-			window.localStorage.removeItem(deletedProductStorageKey);
-			window.localStorage.removeItem(storageKey);
+			clearDeletedInventory(window.localStorage);
 			dispatch(resetDeletedInventory());
 			dispatch(setSearchQuery(''));
 			setRestoreError(null);
@@ -77,32 +80,40 @@ export function OrdersView() {
 		}
 	};
 
-	// Save deletions for the next visit.
+	// Persist deletions across visits
 	const confirmDelete = () => {
 		if (!pendingDelete) return;
 		try {
-			const storedIds: unknown = JSON.parse(window.localStorage.getItem(storageKey) ?? '[]');
-			const deletedIds = Array.isArray(storedIds)
-				? storedIds.filter((id): id is string => typeof id === 'string')
-				: [];
-			window.localStorage.setItem(
-				storageKey,
-				JSON.stringify([...new Set([...deletedIds, pendingDelete.id])]),
-			);
+			persistDeletedId(window.localStorage, deletedOrderStorageKey, pendingDelete.id);
 			dispatch(deleteOrder(pendingDelete.id));
 			dispatch(selectOrder(null));
 			setPendingDelete(null);
 			setDeleteError(null);
 		} catch (caughtError) {
-			console.error('Unable to save the deleted receipt.', caughtError);
+			console.error('Unable to save the deleted order.', caughtError);
 			setDeleteError(
-				'This receipt could not be deleted. Check your browser storage and try again.',
+				'This order could not be deleted. Check your browser storage and try again.',
+			);
+		}
+	};
+
+	const confirmProductDelete = () => {
+		if (!pendingProductDelete) return;
+		try {
+			persistDeletedId(window.localStorage, deletedProductStorageKey, pendingProductDelete.id);
+			dispatch(deleteProduct(pendingProductDelete.id));
+			setPendingProductDelete(null);
+			setProductDeleteError(null);
+		} catch (caughtError) {
+			console.error('Unable to save the deleted product.', caughtError);
+			setProductDeleteError(
+				'This product could not be deleted. Check your browser storage and try again.',
 			);
 		}
 	};
 
 	if (status === 'loading' || status === 'idle') {
-		return <PageFeedback kind='loading' message='Loading your receipts…' />;
+		return <PageFeedback kind='loading' message='Loading your orders…' />;
 	}
 	if (status === 'failed') {
 		return <PageFeedback kind='error' message={error ?? 'Inventory could not be loaded.'} />;
@@ -111,7 +122,7 @@ export function OrdersView() {
 	return (
 		<section className='page'>
 			<PageHeading
-				eyebrow='INVENTORY / RECEIPTS'
+				eyebrow='INVENTORY / ORDERS'
 				title='Orders'
 				count={orders.length}
 				description='Every delivery, organized and accounted for.'
@@ -150,7 +161,7 @@ export function OrdersView() {
 				<MetricCard
 					icon={<Clock3 size={17} />}
 					tone='purple'
-					label='PRODUCT CATEGORIES'
+					label='PRODUCT TYPES'
 					value={uniqueTypes.toString().padStart(2, '0')}
 					note='in your catalog'
 					noteTone='caption'
@@ -165,12 +176,12 @@ export function OrdersView() {
 								Recent orders <span>{visibleOrders.length}</span>
 							</h2>
 
-							<p>Select a receipt to inspect its products</p>
+							<p>Select an order to inspect its products</p>
 						</div>
 
-						<button className='orders__filter' type='button' disabled>
+						{/* <button className='orders__filter' type='button' disabled>
 							<CalendarDays size={15} /> All time <ChevronRight size={14} />
-						</button>
+						</button> */}
 					</div>
 
 					{visibleOrders.length ? (
@@ -262,7 +273,7 @@ export function OrdersView() {
 					)}
 					<div className='orders__footnote'>
 						<span className='orders__footnote-dot' />
-						Showing the latest receipts in your workspace
+						Showing the latest orders in your workspace
 					</div>
 				</section>
 
@@ -271,6 +282,10 @@ export function OrdersView() {
 						order={selectedOrder}
 						products={getOrderProducts(selectedOrder, products)}
 						onClose={() => dispatch(selectOrder(null))}
+						onDeleteProduct={(product) => {
+							setProductDeleteError(null);
+							setPendingProductDelete(product);
+						}}
 						onDelete={() => {
 							setDeleteError(null);
 							setPendingDelete(selectedOrder);
@@ -291,20 +306,33 @@ export function OrdersView() {
 					onConfirm={confirmDelete}
 				/>
 			)}
+
+			{pendingProductDelete && (
+				<ProductDeleteDialog
+					product={pendingProductDelete}
+					error={productDeleteError}
+					onClose={() => {
+						setPendingProductDelete(null);
+						setProductDeleteError(null);
+					}}
+					onConfirm={confirmProductDelete}
+				/>
+			)}
 		</section>
 	);
 }
 
-// Show linked receipt products.
 function OrderDetails({
 	order,
 	products,
 	onClose,
+	onDeleteProduct,
 	onDelete,
 }: {
 	order: Order;
 	products: ReturnType<typeof getOrderProducts>;
 	onClose: () => void;
+	onDeleteProduct: (product: Product) => void;
 	onDelete: () => void;
 }) {
 	const totals = getOrderTotals(products);
@@ -314,7 +342,7 @@ function OrderDetails({
 			<div className='order-details__top'>
 				<div className='order-details__eyebrow'>
 					<span className='eyebrow__dot' />
-					RECEIPT DETAILS
+					ORDER DETAILS
 				</div>
 
 				<button
@@ -346,6 +374,7 @@ function OrderDetails({
 					<span>ORDER TOTAL</span>
 
 					<strong>{formatPrice(totals.USD ?? 0, 'USD')}</strong>
+					<small>{formatPrice(totals.UAH ?? 0, 'UAH')}</small>
 				</div>
 			</div>
 
@@ -369,6 +398,15 @@ function OrderDetails({
 						<span
 							className={`order-details__status-dot ${product.status === 'Available' ? 'order-details__status-dot--available' : 'order-details__status-dot--repair'}`}
 						/>
+						<button
+							className='icon-button order-details__product-delete'
+							type='button'
+							aria-label={`Delete ${product.title} from ${order.title}`}
+							title={`Delete ${product.title}`}
+							onClick={() => onDeleteProduct(product)}
+						>
+							<Trash2 size={14} />
+						</button>
 					</div>
 				))}
 			</div>
@@ -386,7 +424,6 @@ function OrderDetails({
 	);
 }
 
-// Confirm permanent receipt removal.
 function DeleteDialog({
 	order,
 	products,
@@ -406,7 +443,7 @@ function DeleteDialog({
 			title='Delete this order?'
 			description={
 				<>
-					This will remove <strong>{order.title}</strong> and its receipt from your orders list.
+				This will remove <strong>{order.title}</strong> and its products from your orders list.
 				</>
 			}
 			details={
@@ -432,6 +469,45 @@ function DeleteDialog({
 			error={error}
 			cancelLabel='Keep order'
 			confirmLabel='Delete order'
+			onClose={onClose}
+			onConfirm={onConfirm}
+		/>
+	);
+}
+
+function ProductDeleteDialog({
+	product,
+	error,
+	onClose,
+	onConfirm,
+}: {
+	product: Product;
+	error: string | null;
+	onClose: () => void;
+	onConfirm: () => void;
+}) {
+	return (
+		<DeleteConfirmationDialog
+			titleId='delete-order-product-title'
+			title='Delete this product?'
+			description={
+				<>
+					This will remove <strong>{product.title}</strong> from the catalog and this order.
+				</>
+			}
+			details={
+				<div className='delete-dialog__product'>
+					<span className='delete-dialog__product-indicator' />
+					<ProductThumbnail />
+					<span>
+						<strong>{product.title}</strong>
+						<small>{product.serialNumber}</small>
+					</span>
+			</div>
+			}
+			error={error}
+			cancelLabel='Keep product'
+			confirmLabel='Delete product'
 			onClose={onClose}
 			onConfirm={onConfirm}
 		/>

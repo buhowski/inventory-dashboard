@@ -4,7 +4,6 @@ CREATE DATABASE IF NOT EXISTS stockroom
 
 USE stockroom;
 
--- Define incoming receipt records.
 CREATE TABLE IF NOT EXISTS orders (
   id VARCHAR(32) NOT NULL,
   title VARCHAR(180) NOT NULL,
@@ -16,7 +15,6 @@ CREATE TABLE IF NOT EXISTS orders (
   INDEX idx_orders_received_at (received_at)
 ) ENGINE=InnoDB;
 
--- Define catalog products.
 CREATE TABLE IF NOT EXISTS products (
   id VARCHAR(32) NOT NULL,
   order_id VARCHAR(32) NOT NULL,
@@ -42,7 +40,6 @@ CREATE TABLE IF NOT EXISTS products (
     CHECK (guarantee_end >= guarantee_start)
 ) ENGINE=InnoDB;
 
--- Store each supported currency.
 CREATE TABLE IF NOT EXISTS product_prices (
   product_id VARCHAR(32) NOT NULL,
   currency CHAR(3) NOT NULL,

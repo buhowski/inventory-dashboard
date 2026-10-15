@@ -1,6 +1,6 @@
 import type { Order, Product } from '@/lib/types';
 
-// Seed inventory for the dashboard.
+// Demo orders and products
 export const orders: Order[] = [
 	{
 		id: 'ORD-1048',
@@ -32,7 +32,7 @@ export const orders: Order[] = [
 	},
 ];
 
-// Keep each product linked to its receipt.
+// Link each product to its order by ID
 export const products: Product[] = [
 	{
 		id: 'PRD-1201',

@@ -1,25 +1,28 @@
-const CACHE_NAME = 'stockroom-shell-v1';
+const CACHE_PREFIX = 'stockroom-';
+const CACHE_NAME = `${CACHE_PREFIX}shell-v1`;
 const OFFLINE_PAGE = '/offline.html';
 
-// Cache the offline fallback.
 self.addEventListener('install', (event) => {
 	event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.add(OFFLINE_PAGE)));
 	self.skipWaiting();
 });
 
-// Remove outdated app caches.
 self.addEventListener('activate', (event) => {
 	event.waitUntil(
 		caches
 			.keys()
 			.then((keys) =>
-				Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))),
+				Promise.all(
+					keys
+						.filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
+						.map((key) => caches.delete(key)),
+				),
 			),
 	);
 	self.clients.claim();
 });
 
-// Keep API responses fresh.
+// Exclude API and socket requests from caching
 self.addEventListener('fetch', (event) => {
 	const request = event.request;
 	const url = new URL(request.url);

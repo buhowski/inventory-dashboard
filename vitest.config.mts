@@ -1,7 +1,6 @@
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 
-// Share project imports with unit tests.
 export default defineConfig({
 	resolve: {
 		alias: {

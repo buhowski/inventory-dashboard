@@ -9,7 +9,6 @@ type PageHeadingProps = {
 	className?: string;
 };
 
-// page headings.
 export function PageHeading({
 	eyebrow,
 	title,

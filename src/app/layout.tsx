@@ -19,14 +19,12 @@ export const metadata: Metadata = {
 	appleWebApp: { capable: true, statusBarStyle: 'default', title: 'Stockroom' },
 };
 
-// Configure installable app colors.
 export const viewport: Viewport = {
 	themeColor: '#f4f6f8',
 	width: 'device-width',
 	initialScale: 1,
 };
 
-// Provide global inventory services.
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
 	return (
 		<html lang='en' className={geistSans.variable}>

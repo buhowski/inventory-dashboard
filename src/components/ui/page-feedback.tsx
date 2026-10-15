@@ -3,7 +3,6 @@ type PageFeedbackProps = {
 	message: string;
 };
 
-// request feedback.
 export function PageFeedback({ kind, message }: PageFeedbackProps) {
 	if (kind === 'loading') {
 		return (

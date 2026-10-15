@@ -1,4 +1,3 @@
-// a compact product image.
 export function ProductThumbnail() {
 	return (
 		<span className='product-thumbnail' aria-hidden='true'>

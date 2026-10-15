@@ -6,13 +6,12 @@ import type { AppDispatch, RootState } from '@/lib/store';
 import { Search, X } from '@/components/icons';
 import { setSearchQuery } from '@/lib/store';
 
-// Search records visible on each page.
 export function SearchBar() {
 	const dispatch = useDispatch<AppDispatch>();
 	const query = useSelector((state: RootState) => state.inventory.searchQuery);
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	// Focus search from the keyboard.
+	// Focus search with Cmd/Ctrl+K
 	useEffect(() => {
 		const handleShortcut = (event: KeyboardEvent) => {
 			if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
