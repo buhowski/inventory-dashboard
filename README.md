@@ -2,7 +2,7 @@
 
 Demo: https://inventory-dashboard-case.vercel.app
 
-Note: Socket.IO is fully testable locally.
+Note: Socket.IO is fully testable locally (Vercel doesn't support it).
 
 ## Run locally
 
