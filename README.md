@@ -4,15 +4,34 @@ Demo:
 
 ## Run locally
 
-Requirements: Node.js 24 and Yarn 1.22.22.
+Requirements: Node.js 24.x and either Yarn Classic 1.22.22 or npm 10+.
+
+Install dependencies with one package manager:
 
 ```sh
+# Yarn
 yarn install --frozen-lockfile
+
+# Or npm
+npm ci
+```
+
+Both lockfiles are committed so either package manager can install the project reproducibly.
+Use one package manager consistently in a checkout, and update both lockfiles when dependencies change.
+
+Start the app and Socket.IO server:
+
+```sh
+# Yarn
 yarn dev:all
+
+# Or npm
+npm run dev:all
 ```
 
 Open [http://localhost:3000](http://localhost:3000). The Socket.IO server uses port `3001`.
-Alternatively, run `yarn dev` and `yarn dev:socket` in separate terminals.
+To run the services separately, use `yarn dev` and `yarn dev:socket`, or
+`npm run dev` and `npm run dev:socket` in separate terminals.
 
 ## Run with Docker
 
@@ -60,8 +79,9 @@ inventory-dashboard/
 ├── eslint.config.mjs         # ESLint configuration
 ├── next.config.ts            # Next.js configuration
 ├── package.json              # Dependencies and scripts
+├── package-lock.json         # npm dependency lockfile
 ├── README.md                 # Project documentation
 ├── tsconfig.json             # TypeScript configuration
 ├── vitest.config.mts         # Vitest configuration
-└── yarn.lock                 # Dependency lockfile
+└── yarn.lock                 # Yarn dependency lockfile
 ```
