@@ -1,6 +1,6 @@
 # Stockroom
 
-Demo: 
+Demo: https://inventory-dashboard-case.vercel.app
 
 Note: Socket.IO is fully testable locally.
 
@@ -23,7 +23,11 @@ npm ci
 ### Start App and Socket.IO server:
 
 ```sh
+# Yarn
 yarn dev:all
+
+# npm
+npm run dev:all
 ```
 
 Open [http://localhost:3000](http://localhost:3000). 
@@ -33,13 +37,18 @@ The app is available on port `3000`, Socket.IO on `3001`, MySQL on `3306`.
 To run services separately:
 
 ```sh
-yarn dev          # Next.js app
-yarn dev:socket   # Socket.IO server
+# Yarn
+yarn dev           # Next.js app
+yarn dev:socket    # Socket.IO server
+
+# npm
+npm run dev
+npm run dev:socket
 ```
 
 ## Run with Docker
 
-Copy `.env.example` to `.env` update credentials if needed, then run:
+Copy `.env.example` to `.env`, update credentials, then run:
 
 ```sh
 docker compose up --build
@@ -50,10 +59,17 @@ MySQL schema is initialized from `database/schema.sql`.
 ## Checks
 
 ```sh
+# Yarn
 yarn lint
 yarn typecheck
 yarn test
 yarn build
+
+# npm
+npm run lint
+npm run typecheck
+npm run test
+npm run build
 ```
 
 ## Structure
