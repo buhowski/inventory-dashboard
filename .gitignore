@@ -13,6 +13,7 @@ node_modules/
 .env
 .env.*
 !.env.example
+yarn.lock
 
 # Test and tool output
 /coverage/
