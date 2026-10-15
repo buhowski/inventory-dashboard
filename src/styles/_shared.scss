@@ -122,6 +122,7 @@
 }
 
 .page-transition {
+	min-height: var(--height);
 	animation: content-enter 380ms cubic-bezier(0.2, 0.75, 0.2, 1) both;
 }
 

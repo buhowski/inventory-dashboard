@@ -343,8 +343,8 @@
 		margin-right: 8px;
 
 		&:hover {
-			background: #fff1f0 !important;
-			color: #d36a63 !important;
+			background: #fff1f0;
+			color: #d36a63;
 		}
 	}
 }
@@ -435,15 +435,13 @@
 		position: absolute;
 		top: 13px;
 		right: 12px;
-		width: 27px;
-		height: 27px;
 		border: 1px solid #edf0f2;
 		border-radius: 50%;
 		background: white;
 		color: #8b999f;
 
 		&:hover {
-			background: #f2f5f6 !important;
+			background: #f2f5f6;
 		}
 	}
 

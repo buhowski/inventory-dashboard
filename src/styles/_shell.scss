@@ -7,7 +7,7 @@
 
 	// .app__main
 	&__main {
-		min-height: calc(100vh - 72px);
+		min-height: var(--height);
 		margin-left: 232px;
 	}
 
