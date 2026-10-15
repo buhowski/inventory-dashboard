@@ -1,4 +1,4 @@
-// Render a compact product image.
+// a compact product image.
 export function ProductThumbnail() {
 	return (
 		<span className='product-thumbnail' aria-hidden='true'>

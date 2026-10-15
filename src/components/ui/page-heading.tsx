@@ -9,7 +9,7 @@ type PageHeadingProps = {
 	className?: string;
 };
 
-// Render reusable page headings.
+// page headings.
 export function PageHeading({
 	eyebrow,
 	title,

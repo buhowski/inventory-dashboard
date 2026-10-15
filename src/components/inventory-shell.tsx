@@ -20,7 +20,7 @@ const navigation = [
 	{ href: '/products', label: 'Products', icon: Package },
 ];
 
-// Render the shared application frame.
+// the shared application frame.
 export function InventoryShell({ children }: { children: ReactNode }) {
 	const pathname = usePathname();
 

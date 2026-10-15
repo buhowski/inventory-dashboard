@@ -9,7 +9,7 @@ type MetricCardProps = {
 	noteTone: 'trend' | 'caption';
 };
 
-// Render reusable metric cards.
+// metric cards.
 export function MetricCard({ icon, tone, label, value, note, noteTone }: MetricCardProps) {
 	return (
 		<div className='overview__card'>

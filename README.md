@@ -2,9 +2,13 @@
 
 Demo: 
 
+Note: Socket.IO is fully testable locally.
+
 ## Run locally
 
-- Requirements: Node.js 24.x and either Yarn Classic 1.22.22 or npm 10+.
+Requirements:
+- Node.js 24
+- Yarn / npm
 
 ### Install:
 
@@ -19,30 +23,29 @@ npm ci
 ### Start App and Socket.IO server:
 
 ```sh
-# Yarn
 yarn dev:all
-
-# Or npm
-npm run dev:all
 ```
 
 Open [http://localhost:3000](http://localhost:3000). 
-The Socket.IO server uses port `3001`.
-To run the services separately, use `yarn dev` and `yarn dev:socket`, or
-`npm run dev` and `npm run dev:socket` in separate terminals.
+
+The app is available on port `3000`, Socket.IO on `3001`, MySQL on `3306`.
+
+To run services separately:
+
+```sh
+yarn dev          # Next.js app
+yarn dev:socket   # Socket.IO server
+```
 
 ## Run with Docker
 
-Copy `.env.example` to `.env` and replace the sample passwords, then run:
+Copy `.env.example` to `.env` update credentials if needed, then run:
 
 ```sh
 docker compose up --build
 ```
 
-The app is available on port `3000`, 
-Socket.IO on `3001`, 
-and MySQL on `3306`.
-The MySQL schema is initialized from `database/schema.sql`.
+MySQL schema is initialized from `database/schema.sql`.
 
 ## Checks
 
@@ -55,7 +58,7 @@ yarn build
 
 ## Structure
 
-```text
+```sh
 inventory-dashboard/
 ├── database/
 │   └── schema.sql            # MySQL schema for orders, products, and prices
