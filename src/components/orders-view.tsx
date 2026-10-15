@@ -19,12 +19,15 @@ import { PageHeading } from '@/components/ui/page-heading';
 import { ProductThumbnail } from '@/components/ui/product-thumbnail';
 import { CatalogRestoreButton } from '@/components/ui/catalog-restore-button';
 import { DeleteConfirmationDialog } from '@/components/ui/delete-confirmation-dialog';
+import { NewReceiptDialog } from '@/components/ui/new-receipt-dialog';
+import { productTypes as availableProductTypes } from '@/lib/data';
 import {
-	clearDeletedInventory,
+	clearLocalInventory,
 	deletedOrderStorageKey,
 	deletedProductStorageKey,
 	persistDeletedId,
 } from '@/lib/deleted-inventory';
+import { persistCreatedInventory } from '@/lib/local-inventory';
 import {
 	formatCompactDate,
 	formatDate,
@@ -35,6 +38,7 @@ import {
 	matchesSearch,
 } from '@/lib/inventory';
 import {
+	addOrderWithProducts,
 	deleteOrder,
 	deleteProduct,
 	loadInventory,
@@ -55,6 +59,8 @@ export function OrdersView() {
 	const [deleteError, setDeleteError] = useState<string | null>(null);
 	const [pendingProductDelete, setPendingProductDelete] = useState<Product | null>(null);
 	const [productDeleteError, setProductDeleteError] = useState<string | null>(null);
+	const [isCreateOpen, setIsCreateOpen] = useState(false);
+	const [createError, setCreateError] = useState<string | null>(null);
 	const [restoreError, setRestoreError] = useState<string | null>(null);
 
 	const visibleOrders = useMemo(
@@ -64,10 +70,14 @@ export function OrdersView() {
 	const selectedOrder = orders.find((order) => order.id === selectedOrderId) ?? null;
 	const totalUnits = orders.reduce((total, order) => total + order.productIds.length, 0);
 	const uniqueTypes = new Set(products.map(({ type }) => type)).size;
+	const receiptProductTypes = useMemo(
+		() => [...new Set([...availableProductTypes, ...products.map(({ type }) => type)])].sort(),
+		[products],
+	);
 
 	const restoreDemoInventory = () => {
 		try {
-			clearDeletedInventory(window.localStorage);
+			clearLocalInventory(window.localStorage);
 			dispatch(resetDeletedInventory());
 			dispatch(setSearchQuery(''));
 			setRestoreError(null);
@@ -91,9 +101,7 @@ export function OrdersView() {
 			setDeleteError(null);
 		} catch (caughtError) {
 			console.error('Unable to save the deleted order.', caughtError);
-			setDeleteError(
-				'This order could not be deleted. Check your browser storage and try again.',
-			);
+			setDeleteError('This order could not be deleted. Check your browser storage and try again.');
 		}
 	};
 
@@ -108,6 +116,22 @@ export function OrdersView() {
 			console.error('Unable to save the deleted product.', caughtError);
 			setProductDeleteError(
 				'This product could not be deleted. Check your browser storage and try again.',
+			);
+		}
+	};
+
+	const createReceipt = (order: Order, newProducts: Product[]) => {
+		try {
+			persistCreatedInventory(window.localStorage, order, newProducts);
+			dispatch(addOrderWithProducts({ order, products: newProducts }));
+			dispatch(setSearchQuery(''));
+			dispatch(selectOrder(order.id));
+			setCreateError(null);
+			setIsCreateOpen(false);
+		} catch (caughtError) {
+			console.error('Unable to save the new receipt in this browser.', caughtError);
+			setCreateError(
+				'This receipt could not be saved in this browser. Check available storage and try again.',
 			);
 		}
 	};
@@ -130,11 +154,12 @@ export function OrdersView() {
 					<button
 						className='button button--primary'
 						type='button'
-						disabled
-						aria-disabled='true'
-						title='Order creation is not available in this demo'
+						onClick={() => {
+							setCreateError(null);
+							setIsCreateOpen(true);
+						}}
 					>
-						<Plus size={17} /> New order
+						<Plus size={17} /> New receipt
 					</button>
 				}
 			/>
@@ -201,18 +226,14 @@ export function OrdersView() {
 											aria-pressed={active}
 											onClick={() => dispatch(selectOrder(active ? null : order.id))}
 										>
-											<span
-												className={`order-card__index${index === 0 ? ' order-card__index--highlight' : ''}`}
-											>
-												0{index + 1}
-											</span>
+											<span className={`order-card__index`}>0{index + 1}</span>
 
 											<span className='order-card__copy'>
 												<span className='order-card__title'>{order.title}</span>
 
-												<span className='order-card__id'>
-													{order.id} <span className='order-card__separator'>·</span>{' '}
-													{orderProducts.length} products
+												<span className='order-card__count'>
+													{orderProducts.length}{' '}
+													{orderProducts.length === 1 ? 'product' : 'products'}
 												</span>
 											</span>
 
@@ -318,6 +339,19 @@ export function OrdersView() {
 					onConfirm={confirmProductDelete}
 				/>
 			)}
+
+			{isCreateOpen && (
+				<NewReceiptDialog
+					productTypes={receiptProductTypes}
+					existingSerialNumbers={products.map(({ serialNumber }) => serialNumber)}
+					error={createError}
+					onClose={() => {
+						setIsCreateOpen(false);
+						setCreateError(null);
+					}}
+					onCreate={createReceipt}
+				/>
+			)}
 		</section>
 	);
 }
@@ -351,7 +385,7 @@ function OrderDetails({
 					onClick={onClose}
 					aria-label='Close order details'
 				>
-					<X size={17} />
+					<X size={16} />
 				</button>
 
 				<h2>{order.title}</h2>
@@ -360,6 +394,11 @@ function OrderDetails({
 
 				<div className='order-details__date'>
 					<CalendarDays size={14} /> Received {formatDate(order.date)}
+				</div>
+
+				<div className='order-details__reference' aria-label={'Order ID ' + order.id}>
+					<span>ORDER ID</span>
+					<code>{order.id}</code>
 				</div>
 			</div>
 
@@ -443,7 +482,7 @@ function DeleteDialog({
 			title='Delete this order?'
 			description={
 				<>
-				This will remove <strong>{order.title}</strong> and its products from your orders list.
+					This will remove <strong>{order.title}</strong> and its products from your orders list.
 				</>
 			}
 			details={
@@ -503,7 +542,7 @@ function ProductDeleteDialog({
 						<strong>{product.title}</strong>
 						<small>{product.serialNumber}</small>
 					</span>
-			</div>
+				</div>
 			}
 			error={error}
 			cancelLabel='Keep product'

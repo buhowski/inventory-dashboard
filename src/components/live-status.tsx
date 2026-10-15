@@ -34,7 +34,7 @@ export function LiveStatus() {
 			<div className='live-status__clock'>
 				<span className='live-status__date'>
 					{now
-						? new Intl.DateTimeFormat('en-US', {
+						? new Intl.DateTimeFormat('en-GB', {
 								weekday: 'short',
 								month: 'short',
 								day: 'numeric',
@@ -46,7 +46,7 @@ export function LiveStatus() {
 				<span className='live-status__time'>
 					<Clock3 size={14} />
 					{now
-						? new Intl.DateTimeFormat('en-US', {
+						? new Intl.DateTimeFormat('en-GB', {
 								hour: '2-digit',
 								minute: '2-digit',
 								second: '2-digit',

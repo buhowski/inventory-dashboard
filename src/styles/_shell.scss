@@ -163,7 +163,7 @@
 		gap: 6px;
 		font-size: 12px;
 		font-variant-numeric: tabular-nums;
-		font-weight: 650;
+		font-weight: 600;
 
 		svg {
 			color: var(--green-dark);
@@ -268,7 +268,7 @@
 		margin-top: 3px;
 		color: #34454e;
 		font-size: 12px;
-		font-weight: 650;
+		font-weight: 600;
 	}
 
 	// .profile__role
@@ -321,7 +321,7 @@
 		&--active {
 			background: #f0f7e9;
 			color: #578e31;
-			font-weight: 650;
+			font-weight: 600;
 
 			svg {
 				color: #6ba83e;
@@ -376,6 +376,8 @@
 		border-radius: 8px;
 		background: #f0f5eb;
 		color: #6b9c49;
+		font-size: 21px;
+		font-weight: 600;
 	}
 
 	// .workspace__copy

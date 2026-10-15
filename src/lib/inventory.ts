@@ -25,9 +25,10 @@ export function formatCompactDate(value: string): string {
 }
 
 export function formatPrice(value: number, currency: string): string {
-	return new Intl.NumberFormat('en-US', {
+	return new Intl.NumberFormat('en-GB', {
 		style: 'currency',
 		currency,
+		currencyDisplay: currency === 'USD' ? 'narrowSymbol' : 'code',
 		maximumFractionDigits: 2,
 	}).format(value);
 }

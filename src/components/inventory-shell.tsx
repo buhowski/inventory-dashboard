@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { Box, Package, Settings, ShieldCheck, ShoppingBag } from '@/components/icons';
+import { Package, Settings, ShieldCheck, ShoppingBag } from '@/components/icons';
 import { LiveStatus } from '@/components/live-status';
 import { SearchBar } from '@/components/search-bar';
 
@@ -34,14 +34,14 @@ export function InventoryShell({ children }: { children: ReactNode }) {
 			<aside className='sidebar'>
 				<div className='profile'>
 					<div className='profile__avatar' aria-hidden='true'>
-						DR
+						🧠
 					</div>
 
 					<span className='profile__indicator' aria-label='Profile online' />
 
 					<span className='profile__name'>Dr. Gonzo</span>
 
-					<span className='profile__role'>Inventory manager</span>
+					<span className='profile__role'>Master of Coin</span>
 				</div>
 
 				<p className='nav__label'>WORKSPACE</p>
@@ -76,9 +76,7 @@ export function InventoryShell({ children }: { children: ReactNode }) {
 
 				<div className='sidebar__bottom'>
 					<div className='workspace'>
-						<div className='workspace__icon'>
-							<Box size={16} />
-						</div>
+						<div className='workspace__icon'>⟁</div>
 
 						<div className='workspace__copy'>
 							<span>Workspace</span>

@@ -230,3 +230,5 @@ export const products: Product[] = [
 		orderId: 'ORD-1045',
 	},
 ];
+
+export const productTypes = [...new Set(products.map(({ type }) => type))].sort();

@@ -17,7 +17,7 @@
 		height: 61px;
 		grid-template-columns: minmax(0, 1fr) auto;
 		gap: 16px;
-		padding: 0 20px;
+		padding: 0 15px;
 
 		> .brand {
 			display: none;
@@ -50,7 +50,7 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: center;
-		padding: 8px 16px;
+		padding: 8px 15px;
 		border-top: 1px solid #e8edef;
 		border-right: 0;
 		box-shadow: 0 -5px 20px rgb(32 49 60 / 4%);
@@ -89,7 +89,7 @@
 }
 
 .orders {
-	@media (max-width: $breakpoint-wide) {
+	@media (max-width: 1150px) {
 		&--has-detail {
 			grid-template-columns: minmax(0, 1fr);
 		}
@@ -227,7 +227,7 @@
 	}
 
 	@media (max-width: $breakpoint-mobile) {
-		padding: 28px 20px 36px;
+		padding: 28px 15px 36px;
 
 		&__heading {
 			min-height: 88px;
@@ -264,7 +264,7 @@
 }
 
 .overview {
-	@media (max-width: $breakpoint-mobile) {
+	@media (max-width: $breakpoint-tablet) {
 		gap: 10px;
 		margin-bottom: 24px;
 
@@ -299,11 +299,6 @@
 			font-size: 8px;
 			letter-spacing: 0.06em;
 			white-space: normal;
-		}
-
-		&__trend,
-		&__caption {
-			display: none;
 		}
 	}
 }
@@ -396,6 +391,50 @@
 			.button {
 				padding: 0 14px;
 				font-size: 12px;
+			}
+		}
+	}
+}
+
+.receipt-form {
+	@media (max-width: $breakpoint-mobile) {
+		max-height: calc(100dvh - 30px);
+		border-radius: 12px;
+
+		&__header {
+			padding: 19px 18px 15px;
+
+			h2 {
+				font-size: 19px;
+			}
+		}
+
+		&__close {
+			top: 12px;
+			right: 12px;
+		}
+
+		&__body {
+			gap: 17px;
+			padding: 16px 18px;
+		}
+
+		&__fields {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 10px;
+
+			&--details {
+				grid-template-columns: minmax(0, 1fr);
+			}
+		}
+
+		&__actions {
+			padding: 12px 18px 15px;
+
+			.button {
+				flex: 1;
+				padding: 0 9px;
+				font-size: 10px;
 			}
 		}
 	}

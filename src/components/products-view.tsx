@@ -16,7 +16,7 @@ import { PageHeading } from '@/components/ui/page-heading';
 import { DeleteConfirmationDialog } from '@/components/ui/delete-confirmation-dialog';
 import { CatalogRestoreButton } from '@/components/ui/catalog-restore-button';
 import {
-	clearDeletedInventory,
+	clearLocalInventory,
 	deletedProductStorageKey,
 	persistDeletedId,
 } from '@/lib/deleted-inventory';
@@ -77,7 +77,7 @@ export function ProductsView() {
 
 	const restoreDemoProducts = () => {
 		try {
-			clearDeletedInventory(window.localStorage);
+			clearLocalInventory(window.localStorage);
 			dispatch(resetDeletedInventory());
 			dispatch(setSearchQuery(''));
 			setSelectedType('All products');
@@ -130,7 +130,7 @@ export function ProductsView() {
 
 			<div className='catalog__toolbar'>
 				<div className='catalog__toolbar-label'>
-					<span className='catalog__toolbar-dot' /> ALL STOCK{' '}
+					<span className='catalog__toolbar-dot' /> ALL STOCK
 					<span>{visibleProducts.length} ITEMS</span>
 				</div>
 			</div>
@@ -191,13 +191,12 @@ export function ProductsView() {
 										<td>
 											<div className='catalog__warranty'>
 												<span>
-													{formatCompactDate(product.guarantee.start)} <ChevronRight size={12} />{' '}
+													{formatCompactDate(product.guarantee.start)} <ChevronRight size={12} />
 													{formatCompactDate(product.guarantee.end)}
 												</span>
 
 												<small>
-													{formatDate(product.guarantee.start)} —{' '}
-													{formatDate(product.guarantee.end)}
+													{formatDate(product.guarantee.start)} —{formatDate(product.guarantee.end)}
 												</small>
 											</div>
 										</td>
@@ -257,7 +256,7 @@ export function ProductsView() {
 
 					<div className='catalog__table-footer'>
 						<span>
-							Showing <strong>{visibleProducts.length}</strong> of{' '}
+							Showing <strong>{visibleProducts.length}</strong> of
 							<strong>{products.length}</strong> products
 						</span>
 

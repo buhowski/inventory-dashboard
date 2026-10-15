@@ -12,7 +12,8 @@ export function DialogOverlay({ children, onClose }: { children: ReactNode; onCl
 		const previouslyFocused =
 			document.activeElement instanceof HTMLElement ? document.activeElement : null;
 		const focusableElements = overlay.querySelectorAll<HTMLElement>(focusableSelector);
-		(focusableElements[0] ?? overlay).focus();
+		const preferredFocus = overlay.querySelector<HTMLElement>('[data-autofocus]');
+		(preferredFocus ?? focusableElements[0] ?? overlay).focus();
 
 		return () => {
 			if (previouslyFocused?.isConnected) previouslyFocused.focus();

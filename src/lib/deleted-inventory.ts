@@ -1,3 +1,5 @@
+import { createdInventoryStorageKey } from '@/lib/local-inventory';
+
 export const deletedOrderStorageKey = 'inventory.deletedOrders';
 export const deletedProductStorageKey = 'inventory.deletedProducts';
 
@@ -25,4 +27,9 @@ export function persistDeletedId(storage: InventoryStorage, key: string, id: str
 export function clearDeletedInventory(storage: InventoryStorage): void {
 	storage.removeItem(deletedOrderStorageKey);
 	storage.removeItem(deletedProductStorageKey);
+}
+
+export function clearLocalInventory(storage: InventoryStorage): void {
+	clearDeletedInventory(storage);
+	storage.removeItem(createdInventoryStorageKey);
 }

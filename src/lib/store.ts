@@ -7,6 +7,7 @@ import {
 	type PayloadAction,
 } from '@reduxjs/toolkit';
 import type { Order, Product } from '@/lib/types';
+import { readCreatedInventory } from '@/lib/local-inventory';
 
 interface InventoryState {
 	orders: Order[];
@@ -44,8 +45,19 @@ export const loadInventory = createAsyncThunk('inventory/load', async (_, { reje
 		ordersResponse.json() as Promise<Order[]>,
 		productsResponse.json() as Promise<Product[]>,
 	]);
+	let createdInventory = { orders: [] as Order[], products: [] as Product[] };
+	if (typeof window !== 'undefined') {
+		try {
+			createdInventory = readCreatedInventory(window.localStorage);
+		} catch {
+			// Keep the server-provided demo inventory available if browser storage is blocked.
+		}
+	}
 
-	return { orders, products };
+	return {
+		orders: [...orders, ...createdInventory.orders],
+		products: [...products, ...createdInventory.products],
+	};
 });
 
 const inventorySlice = createSlice({
@@ -57,6 +69,10 @@ const inventorySlice = createSlice({
 		},
 		selectOrder(state, action: PayloadAction<string | null>) {
 			state.selectedOrderId = action.payload;
+		},
+		addOrderWithProducts(state, action: PayloadAction<{ order: Order; products: Product[] }>) {
+			state.orders.unshift(action.payload.order);
+			state.products.unshift(...action.payload.products);
 		},
 		setDeletedOrderIds(state, action: PayloadAction<string[]>) {
 			state.deletedOrderIds = action.payload;
@@ -133,6 +149,7 @@ const inventorySlice = createSlice({
 export const {
 	deleteOrder,
 	deleteProduct,
+	addOrderWithProducts,
 	resetDeletedInventory,
 	selectOrder,
 	setDeletedOrderIds,

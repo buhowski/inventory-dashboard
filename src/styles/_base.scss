@@ -8,6 +8,7 @@ html {
 }
 
 body {
+	min-width: 320px;
 	min-height: 100vh;
 	margin: 0;
 	background: var(--page);
@@ -28,6 +29,11 @@ button,
 a,
 select {
 	-webkit-tap-highlight-color: transparent;
+}
+
+select {
+	cursor: pointer;
+	background-position-x: 90%;
 }
 
 button {

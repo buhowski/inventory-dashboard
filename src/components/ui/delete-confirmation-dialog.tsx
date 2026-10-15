@@ -39,7 +39,7 @@ export function DeleteConfirmationDialog({
 					onClick={onClose}
 					aria-label='Close confirmation'
 				>
-					<X size={18} />
+					<X size={16} />
 				</button>
 
 				<div className='delete-dialog__icon'>
