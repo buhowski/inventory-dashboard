@@ -26,7 +26,6 @@
 		"socket.io-client": "^4.8.4"
 	},
 	"devDependencies": {
-		"@tailwindcss/turbopack": "^4",
 		"@types/node": "^22.20.5",
 		"@types/react": "^19",
 		"@types/react-dom": "^19",
@@ -35,7 +34,6 @@
 		"eslint-config-next": "16.4.0",
 		"prettier": "^3.9.10",
 		"sass": "^1.105.1",
-		"tailwindcss": "^4",
 		"tsx": "^4.23.15",
 		"typescript": "^6.0.3",
 		"vite": "^7",

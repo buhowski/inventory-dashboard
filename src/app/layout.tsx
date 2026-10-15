@@ -1,19 +1,13 @@
 import type { Metadata, Viewport } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist } from 'next/font/google';
 import { Suspense } from 'react';
 import { InventoryShell } from '@/components/inventory-shell';
 import { Providers } from '@/components/providers';
 import { PwaRegistration } from '@/components/pwa-registration';
-import '../styles/globals.css';
 import '../styles/main.scss';
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
-	subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-	variable: '--font-geist-mono',
 	subsets: ['latin'],
 });
 
@@ -35,7 +29,7 @@ export const viewport: Viewport = {
 // Provide global inventory services.
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
 	return (
-		<html lang='en' className={`${geistSans.variable} ${geistMono.variable}`}>
+		<html lang='en' className={geistSans.variable}>
 			<body>
 				<Suspense
 					fallback={

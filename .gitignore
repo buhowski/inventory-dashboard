@@ -14,9 +14,6 @@ node_modules/
 .env.*
 !.env.example
 
-# Lockfiles
-yarn.lock
-
 # Test and tool output
 /coverage/
 /.turbo/
