@@ -4,12 +4,13 @@ Demo: https://inventory-dashboard-case.vercel.app
 
 Note: Socket.IO is fully testable locally (Vercel doesn't support it).
 
-## Run locally
+## Getting Started
 
 Requirements:
-
 - Node.js 24
 - Yarn
+
+### Run
 
 ```sh
 yarn install --frozen-lockfile
@@ -19,11 +20,11 @@ yarn dev:all
 
 Open [http://localhost:3000](http://localhost:3000).
 
-Run separately:
+### Run services separately
 
 ```sh
-yarn dev        # Next.js app — port 3000
-yarn dev:socket # Socket.IO server — port 3001
+yarn dev           # App — port 3000
+yarn dev:socket    # Socket.IO — port 3001
 ```
 
 ## Docker
@@ -46,8 +47,6 @@ yarn build
 ```sh
 inventory-dashboard/
 ├── database/
-│   ├── migrations/
-│   │   └── 001_orders_to_receipts.sql # Rename legacy orders and product links
 │   └── schema.sql            # MySQL schema for review
 ├── Dockerfile                # Multi-stage Docker image for the app
 ├── docker-compose.yml        # App and Socket.IO, with an optional MySQL demo profile
