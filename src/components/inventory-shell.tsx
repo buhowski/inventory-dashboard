@@ -62,18 +62,6 @@ export function InventoryShell({ children }: { children: ReactNode }) {
 					))}
 				</nav>
 
-				<p className='nav__label nav__label--secondary'>MANAGE</p>
-
-				<nav className='nav' aria-label='Management'>
-					<div className='nav__item nav__item--disabled' aria-disabled='true'>
-						<Settings size={17} />
-
-						<span>Settings</span>
-
-						<span className='nav__soon'>Soon</span>
-					</div>
-				</nav>
-
 				<div className='sidebar__bottom'>
 					<div className='workspace'>
 						<div className='workspace__icon'>⟁</div>
