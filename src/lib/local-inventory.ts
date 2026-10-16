@@ -29,7 +29,11 @@ function normalizeReceipt(value: unknown): Receipt | null {
 		Array.isArray(value.productIds) &&
 		value.productIds.every((id) => typeof id === 'string');
 	if (!isValidReceipt) return null;
-	const normalizedValue = { ...value, id, receivedAt };
+	const normalizedValue: Record<string, unknown> = {
+		...value,
+		id,
+		receivedAt,
+	};
 	delete normalizedValue.date;
 	return normalizedValue as unknown as Receipt;
 }
@@ -39,7 +43,7 @@ function normalizeProduct(value: unknown): Product | null {
 	const receiptId =
 		typeof value.receiptId === 'string' ? value.receiptId : value.orderId;
 	if (typeof receiptId !== 'string') return null;
-	const normalizedValue = {
+	const normalizedValue: Record<string, unknown> = {
 		...value,
 		receiptId: receiptId.replace(/^ORD-/, 'RCT-'),
 	};
@@ -64,7 +68,7 @@ function normalizeProduct(value: unknown): Product | null {
 				typeof price.value === 'number' &&
 				Number.isFinite(price.value),
 		);
-	return isValidProduct ? (normalizedValue as Product) : null;
+	return isValidProduct ? (normalizedValue as unknown as Product) : null;
 }
 
 export function readCreatedInventory(

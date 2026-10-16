@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import {
 	Package,
-	Settings,
 	ShieldCheck,
 	ShoppingBag,
 } from '@/components/icons';
