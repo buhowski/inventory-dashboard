@@ -15,8 +15,17 @@
 	border-radius: $scrollbar-radius;
 
 	&:hover {
-		background-color: $scrollbar-thumb-hover;
+		background: $scrollbar-thumb-hover;
 	}
+}
+
+html,
+body,
+.catalog__table-inner,
+.dialog-overlay,
+.receipt-form__body {
+	scrollbar-width: thin;
+	scrollbar-color: $scrollbar-thumb $scrollbar-bg;
 }
 
 * {

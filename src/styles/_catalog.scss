@@ -107,6 +107,7 @@
 	&__table-wrap {
 		@include surface-panel;
 		overflow: hidden;
+		width: 100%;
 		border-radius: 0 0 10px 10px;
 	}
 
@@ -134,29 +135,34 @@
 			letter-spacing: 0.055em;
 			text-transform: uppercase;
 			white-space: nowrap;
+
+			&:first-child {
+				padding-left: 17px;
+			}
+
+			&:nth-child(1) {
+				width: 27%;
+			}
+
+			&:nth-child(2),
+			&:nth-child(4),
+			&:nth-child(5) {
+				width: 12%;
+			}
+
+			&:nth-child(3) {
+				width: 19%;
+			}
+
+			&:nth-child(6) {
+				width: 15%;
+			}
 		}
 
-		th:first-child,
-		td:first-child {
-			padding-left: 17px;
-		}
-
-		th:nth-child(1) {
-			width: 27%;
-		}
-
-		th:nth-child(2),
-		th:nth-child(4),
-		th:nth-child(5) {
-			width: 12%;
-		}
-
-		th:nth-child(3) {
-			width: 19%;
-		}
-
-		th:nth-child(6) {
-			width: 15%;
+		td {
+			&:first-child {
+				padding-left: 17px;
+			}
 		}
 
 		td {

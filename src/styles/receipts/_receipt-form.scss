@@ -6,12 +6,10 @@
 
 	display: flex;
 	width: min(100%, 820px);
-	max-height: min(90dvh, 920px);
 	flex-direction: column;
 	overflow: hidden;
 
 	@media (max-width: $breakpoint-mobile) {
-		max-height: calc(100dvh - 30px);
 		border-radius: 12px;
 	}
 
@@ -78,8 +76,6 @@
 		display: grid;
 		min-height: 0;
 		gap: 20px;
-		overflow-y: auto;
-		overscroll-behavior: contain;
 		padding: 20px 26px;
 
 		@media (max-width: $breakpoint-mobile) {
