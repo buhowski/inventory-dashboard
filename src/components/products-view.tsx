@@ -156,9 +156,7 @@ export function ProductsView() {
 
 									<th scope='col'>Receipt</th>
 
-									<th scope='col'>
-										<span className='sr-only'>Actions</span>
-									</th>
+									<th scope='col' aria-label='Actions'></th>
 								</tr>
 							</thead>
 

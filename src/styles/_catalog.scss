@@ -106,15 +106,15 @@
 	// .catalog__table-wrap
 	&__table-wrap {
 		@include surface-panel;
-		overflow: hidden;
-		width: 100%;
 		border-radius: 0 0 10px 10px;
 	}
 
 	// .catalog__table-inner
 	&__table-inner {
-		overflow-y: hidden;
+		width: 100%;
 		overflow-x: auto;
+		overflow-y: hidden;
+		-webkit-overflow-scrolling: touch;
 	}
 
 	// .catalog__table
