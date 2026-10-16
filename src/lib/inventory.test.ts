@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-	getReceiptProducts,
-	getReceiptTotals,
-	matchesSearch,
-} from '@/lib/inventory';
+import { getReceiptProducts, getReceiptTotals, matchesSearch } from '@/lib/inventory';
 import {
 	deleteReceipt,
 	deleteProduct,
@@ -68,15 +64,11 @@ describe('inventory helpers', () => {
 	});
 
 	it('resolves only the products listed on a receipt', () => {
-		expect(
-			getReceiptProducts(receipt, sampleProducts).map(({ id }) => id),
-		).toEqual(['PRD-1', 'PRD-2']);
-		expect(
-			getReceiptProducts(
-				{ ...receipt, productIds: ['missing'] },
-				sampleProducts,
-			),
-		).toEqual([]);
+		expect(getReceiptProducts(receipt, sampleProducts).map(({ id }) => id)).toEqual([
+			'PRD-1',
+			'PRD-2',
+		]);
+		expect(getReceiptProducts({ ...receipt, productIds: ['missing'] }, sampleProducts)).toEqual([]);
 	});
 
 	it('searches case-insensitively and ignores surrounding spaces', () => {
@@ -129,12 +121,8 @@ describe('inventory state', () => {
 
 		store.dispatch(deleteProduct('PRD-1'));
 
-		expect(store.getState().inventory.products.map(({ id }) => id)).toEqual([
-			'PRD-2',
-		]);
-		expect(store.getState().inventory.receipts[0].productIds).toEqual([
-			'PRD-2',
-		]);
+		expect(store.getState().inventory.products.map(({ id }) => id)).toEqual(['PRD-2']);
+		expect(store.getState().inventory.receipts[0].productIds).toEqual(['PRD-2']);
 		expect(
 			getReceiptProducts(
 				store.getState().inventory.receipts[0],
@@ -154,12 +142,8 @@ describe('inventory state', () => {
 			),
 		);
 
-		expect(store.getState().inventory.products.map(({ id }) => id)).toEqual([
-			'PRD-2',
-		]);
-		expect(store.getState().inventory.receipts[0].productIds).toEqual([
-			'PRD-2',
-		]);
+		expect(store.getState().inventory.products.map(({ id }) => id)).toEqual(['PRD-2']);
+		expect(store.getState().inventory.receipts[0].productIds).toEqual(['PRD-2']);
 	});
 
 	it('restores deleted receipts and products when demo inventory is reset and reloaded', () => {
@@ -175,14 +159,8 @@ describe('inventory state', () => {
 			),
 		);
 
-		expect(store.getState().inventory.products.map(({ id }) => id)).toEqual([
-			'PRD-1',
-			'PRD-2',
-		]);
-		expect(store.getState().inventory.receipts[0].productIds).toEqual([
-			'PRD-1',
-			'PRD-2',
-		]);
+		expect(store.getState().inventory.products.map(({ id }) => id)).toEqual(['PRD-1', 'PRD-2']);
+		expect(store.getState().inventory.receipts[0].productIds).toEqual(['PRD-1', 'PRD-2']);
 		expect(store.getState().inventory.deletedReceiptIds).toEqual([]);
 	});
 });

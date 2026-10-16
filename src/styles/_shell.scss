@@ -6,9 +6,14 @@
 	padding-top: 72px;
 	overflow-x: hidden;
 
+	@media (max-width: $breakpoint-mobile) {
+		padding-top: 61px;
+		padding-bottom: 70px;
+	}
+
 	// .app__main
 	&__main {
-		min-height: var(--height);
+		min-height: var(--window-height);
 		margin-left: var(--sidebar-width);
 
 		@media (max-width: $breakpoint-mobile) {
@@ -29,19 +34,16 @@
 		color: #71818a;
 		font-size: 12px;
 	}
-
-	@media (max-width: $breakpoint-mobile) {
-		padding-top: 0;
-		padding-bottom: 70px;
-	}
 }
 
 .topbar {
 	position: fixed;
-	z-index: 20;
-	inset: 0 0 auto;
+	z-index: 100;
+	top: 0;
+	left: 0;
+	width: 100%;
 	display: grid;
-	height: 72px;
+	height: $header-size;
 	grid-template-columns: var(--sidebar-width) minmax(250px, 490px) 1fr;
 	align-items: center;
 	gap: 28px;
@@ -63,9 +65,8 @@
 	}
 
 	@media (max-width: $breakpoint-mobile) {
-		position: sticky;
 		height: 61px;
-		grid-template-columns: minmax(0, 1fr) auto;
+		grid-template-columns: 1fr auto;
 		gap: 16px;
 		padding: 0 15px;
 
@@ -212,10 +213,6 @@
 		grid-column: 2;
 		grid-row: 1;
 		gap: 12px;
-
-		&__clock {
-			display: none;
-		}
 	}
 }
 
@@ -231,6 +228,10 @@
 	color: #6a7a83;
 	font-size: 11px;
 	font-weight: 600;
+
+	@media (max-width: $breakpoint-mobile) {
+		display: none;
+	}
 
 	// .presence__light
 	&__light {
@@ -248,15 +249,11 @@
 	svg {
 		color: var(--green-dark);
 	}
-
-	@media (max-width: $breakpoint-mobile) {
-		min-width: 0;
-	}
 }
 
 .sidebar {
 	position: fixed;
-	z-index: 10;
+	z-index: 90;
 	inset: 72px auto 0 0;
 	display: flex;
 	width: var(--sidebar-width);

@@ -3,11 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
-import {
-	Package,
-	ShieldCheck,
-	ShoppingBag,
-} from '@/components/icons';
+import { Package, ShieldCheck, ShoppingBag } from '@/components/icons';
 import { LiveStatus } from '@/components/live-status';
 import { SearchBar } from '@/components/search-bar';
 

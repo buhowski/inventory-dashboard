@@ -1,8 +1,17 @@
+// Scrollbar styles
+$scrollbar-bg: transparent;
+$scrollbar-thumb: rgba(#000, 0.4);
+$scrollbar-thumb-hover: rgba(#000, 0.8);
+$scrollbar-radius: 10px;
+$scrollbar-width: 2px;
+
 // Breakpoints
 $breakpoint-wide: 1270px;
 $breakpoint-receipt-detail: 1150px;
 $breakpoint-tablet: 1050px;
 $breakpoint-mobile: 740px;
+
+$header-size: 72px;
 
 // Color tokens
 :root {
@@ -20,7 +29,8 @@ $breakpoint-mobile: 740px;
 	--blue: #729bb5;
 	--shadow: 0 12px 34px rgb(31 53 65 / 5%);
 	--sidebar-width: 232px;
-	--height: calc(100vh - 72px);
+	--window-width: calc(100% - var(--sidebar-width));
+	--window-height: calc(100vh - #{$header-size});
 
 	@media (max-width: $breakpoint-wide) {
 		--sidebar-width: 208px;
@@ -31,6 +41,6 @@ $breakpoint-mobile: 740px;
 	}
 
 	@media (max-width: $breakpoint-mobile) {
-		--height: calc(100vh - 61px);
+		--window-height: calc(100vh - 61px);
 	}
 }

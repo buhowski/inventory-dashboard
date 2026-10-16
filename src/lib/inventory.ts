@@ -37,10 +37,7 @@ export function matchesSearch(value: string, query: string): boolean {
 	return value.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase());
 }
 
-export function getReceiptProducts(
-	receipt: Receipt,
-	products: Product[],
-): Product[] {
+export function getReceiptProducts(receipt: Receipt, products: Product[]): Product[] {
 	return receipt.productIds
 		.map((productId) => products.find((product) => product.id === productId))
 		.filter((product): product is Product => product !== undefined);
@@ -50,9 +47,6 @@ export function getReceiptSearchText(receipt: Receipt): string {
 	return `${receipt.title} ${receipt.id} ${receipt.description}`;
 }
 
-export function getProductSearchText(
-	product: Product,
-	receipt?: Receipt,
-): string {
+export function getProductSearchText(product: Product, receipt?: Receipt): string {
 	return `${product.title} ${product.type} ${product.serialNumber} ${product.specification} ${receipt?.title ?? ''}`;
 }

@@ -23,10 +23,7 @@ describe('deleted inventory storage', () => {
 			[deletedProductStorageKey]: '{invalid json',
 		});
 
-		expect(readDeletedIds(storage, deletedReceiptStorageKey)).toEqual([
-			'receipt-1',
-			'receipt-2',
-		]);
+		expect(readDeletedIds(storage, deletedReceiptStorageKey)).toEqual(['receipt-1', 'receipt-2']);
 		expect(readDeletedIds(storage, deletedProductStorageKey)).toEqual([]);
 	});
 
@@ -38,10 +35,7 @@ describe('deleted inventory storage', () => {
 		persistDeletedId(storage, deletedProductStorageKey, 'product-1');
 		persistDeletedId(storage, deletedProductStorageKey, 'product-2');
 
-		expect(readDeletedIds(storage, deletedProductStorageKey)).toEqual([
-			'product-1',
-			'product-2',
-		]);
+		expect(readDeletedIds(storage, deletedProductStorageKey)).toEqual(['product-1', 'product-2']);
 	});
 
 	it('clears deleted IDs for receipts and products', () => {

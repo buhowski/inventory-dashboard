@@ -17,10 +17,8 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function normalizeReceipt(value: unknown): Receipt | null {
 	if (!isRecord(value)) return null;
-	const receivedAt =
-		typeof value.receivedAt === 'string' ? value.receivedAt : value.date;
-	const id =
-		typeof value.id === 'string' ? value.id.replace(/^ORD-/, 'RCT-') : value.id;
+	const receivedAt = typeof value.receivedAt === 'string' ? value.receivedAt : value.date;
+	const id = typeof value.id === 'string' ? value.id.replace(/^ORD-/, 'RCT-') : value.id;
 	const isValidReceipt =
 		typeof id === 'string' &&
 		typeof value.title === 'string' &&
@@ -40,8 +38,7 @@ function normalizeReceipt(value: unknown): Receipt | null {
 
 function normalizeProduct(value: unknown): Product | null {
 	if (!isRecord(value)) return null;
-	const receiptId =
-		typeof value.receiptId === 'string' ? value.receiptId : value.orderId;
+	const receiptId = typeof value.receiptId === 'string' ? value.receiptId : value.orderId;
 	if (typeof receiptId !== 'string') return null;
 	const normalizedValue: Record<string, unknown> = {
 		...value,
@@ -71,9 +68,7 @@ function normalizeProduct(value: unknown): Product | null {
 	return isValidProduct ? (normalizedValue as unknown as Product) : null;
 }
 
-export function readCreatedInventory(
-	storage: Pick<Storage, 'getItem'>,
-): CreatedInventory {
+export function readCreatedInventory(storage: Pick<Storage, 'getItem'>): CreatedInventory {
 	const storedValue = storage.getItem(createdInventoryStorageKey);
 	if (!storedValue) return emptyInventory;
 

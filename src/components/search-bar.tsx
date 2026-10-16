@@ -43,7 +43,7 @@ export function SearchBar() {
 					aria-label='Clear search'
 					onClick={() => dispatch(setSearchQuery(''))}
 				>
-					<X size={15} />
+					<X size={14} />
 				</button>
 			) : (
 				<kbd className='search__shortcut'>⌘ K</kbd>

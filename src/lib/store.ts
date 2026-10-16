@@ -31,42 +31,37 @@ const initialState: InventoryState = {
 	error: null,
 };
 
-export const loadInventory = createAsyncThunk(
-	'inventory/load',
-	async (_, { rejectWithValue }) => {
-		const [receiptsResponse, productsResponse] = await Promise.all([
-			fetch('/api/receipts', { cache: 'no-store' }),
-			fetch('/api/products', { cache: 'no-store' }),
-		]);
+export const loadInventory = createAsyncThunk('inventory/load', async (_, { rejectWithValue }) => {
+	const [receiptsResponse, productsResponse] = await Promise.all([
+		fetch('/api/receipts', { cache: 'no-store' }),
+		fetch('/api/products', { cache: 'no-store' }),
+	]);
 
-		if (!receiptsResponse.ok || !productsResponse.ok) {
-			return rejectWithValue(
-				'Inventory could not be loaded. Please try again.',
-			);
+	if (!receiptsResponse.ok || !productsResponse.ok) {
+		return rejectWithValue('Inventory could not be loaded. Please try again.');
+	}
+
+	const [receipts, products] = await Promise.all([
+		receiptsResponse.json() as Promise<Receipt[]>,
+		productsResponse.json() as Promise<Product[]>,
+	]);
+	let createdInventory = {
+		receipts: [] as Receipt[],
+		products: [] as Product[],
+	};
+	if (typeof window !== 'undefined') {
+		try {
+			createdInventory = readCreatedInventory(window.localStorage);
+		} catch {
+			// Keep the server-provided demo inventory available if browser storage is blocked.
 		}
+	}
 
-		const [receipts, products] = await Promise.all([
-			receiptsResponse.json() as Promise<Receipt[]>,
-			productsResponse.json() as Promise<Product[]>,
-		]);
-		let createdInventory = {
-			receipts: [] as Receipt[],
-			products: [] as Product[],
-		};
-		if (typeof window !== 'undefined') {
-			try {
-				createdInventory = readCreatedInventory(window.localStorage);
-			} catch {
-				// Keep the server-provided demo inventory available if browser storage is blocked.
-			}
-		}
-
-		return {
-			receipts: [...receipts, ...createdInventory.receipts],
-			products: [...products, ...createdInventory.products],
-		};
-	},
-);
+	return {
+		receipts: [...receipts, ...createdInventory.receipts],
+		products: [...products, ...createdInventory.products],
+	};
+});
 
 const inventorySlice = createSlice({
 	name: 'inventory',
@@ -87,9 +82,7 @@ const inventorySlice = createSlice({
 		},
 		setDeletedReceiptIds(state, action: PayloadAction<string[]>) {
 			state.deletedReceiptIds = action.payload;
-			state.receipts = state.receipts.filter(
-				(receipt) => !action.payload.includes(receipt.id),
-			);
+			state.receipts = state.receipts.filter((receipt) => !action.payload.includes(receipt.id));
 			state.products = state.products.filter(
 				(product) => !action.payload.includes(product.receiptId),
 			);
@@ -107,30 +100,17 @@ const inventorySlice = createSlice({
 			}));
 		},
 		deleteReceipt(state, action: PayloadAction<string>) {
-			state.deletedReceiptIds = [
-				...new Set([...state.deletedReceiptIds, action.payload]),
-			];
-			state.receipts = state.receipts.filter(
-				(receipt) => receipt.id !== action.payload,
-			);
-			state.products = state.products.filter(
-				(product) => product.receiptId !== action.payload,
-			);
-			if (state.selectedReceiptId === action.payload)
-				state.selectedReceiptId = null;
+			state.deletedReceiptIds = [...new Set([...state.deletedReceiptIds, action.payload])];
+			state.receipts = state.receipts.filter((receipt) => receipt.id !== action.payload);
+			state.products = state.products.filter((product) => product.receiptId !== action.payload);
+			if (state.selectedReceiptId === action.payload) state.selectedReceiptId = null;
 		},
 		deleteProduct(state, action: PayloadAction<string>) {
-			state.deletedProductIds = [
-				...new Set([...state.deletedProductIds, action.payload]),
-			];
-			state.products = state.products.filter(
-				(product) => product.id !== action.payload,
-			);
+			state.deletedProductIds = [...new Set([...state.deletedProductIds, action.payload])];
+			state.products = state.products.filter((product) => product.id !== action.payload);
 			state.receipts = state.receipts.map((receipt) => ({
 				...receipt,
-				productIds: receipt.productIds.filter(
-					(productId) => productId !== action.payload,
-				),
+				productIds: receipt.productIds.filter((productId) => productId !== action.payload),
 			}));
 		},
 		resetDeletedInventory(state) {
@@ -158,9 +138,7 @@ const inventorySlice = createSlice({
 				const productIds = new Set(state.products.map((product) => product.id));
 				state.receipts = state.receipts.map((receipt) => ({
 					...receipt,
-					productIds: receipt.productIds.filter((productId) =>
-						productIds.has(productId),
-					),
+					productIds: receipt.productIds.filter((productId) => productIds.has(productId)),
 				}));
 				state.status = 'ready';
 			})

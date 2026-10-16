@@ -56,14 +56,16 @@ export function DialogOverlay({ children, onClose }: { children: ReactNode; onCl
 	};
 
 	return (
-		<div
-			ref={overlayRef}
-			className='dialog-overlay'
-			tabIndex={-1}
-			onMouseDown={handleMouseDown}
-			onKeyDown={handleKeyDown}
-		>
-			{children}
+		<div className='dialog-wrapper'>
+			<div
+				ref={overlayRef}
+				className='dialog-overlay'
+				tabIndex={-1}
+				onMouseDown={handleMouseDown}
+				onKeyDown={handleKeyDown}
+			>
+				<div>{children}</div>
+			</div>
 		</div>
 	);
 }

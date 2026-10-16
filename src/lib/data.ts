@@ -270,6 +270,4 @@ export const products: Product[] = [
 	},
 ];
 
-export const productTypes = [
-	...new Set(products.map(({ type }) => type)),
-].sort();
+export const productTypes = [...new Set(products.map(({ type }) => type))].sort();

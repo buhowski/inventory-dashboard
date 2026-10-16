@@ -126,10 +126,7 @@
 		width: 100%;
 		min-width: 0;
 		min-height: 73px;
-		grid-template-columns: 35px minmax(125px, 1fr) minmax(80px, 0.54fr) minmax(
-				80px,
-				0.63fr
-			);
+		grid-template-columns: 35px minmax(125px, 1fr) minmax(80px, 0.54fr) minmax(80px, 0.63fr);
 		align-items: center;
 		gap: 11px;
 		padding: 11px 12px;

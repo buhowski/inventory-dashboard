@@ -22,18 +22,10 @@ export function Providers({ children }: { children: ReactNode }) {
 	useEffect(() => {
 		// Restore deleted IDs before loading inventory
 		try {
-			const deletedReceiptIds = readDeletedIds(
-				window.localStorage,
-				deletedReceiptStorageKey,
-			);
-			const deletedProductIds = readDeletedIds(
-				window.localStorage,
-				deletedProductStorageKey,
-			);
-			if (deletedReceiptIds.length)
-				store.dispatch(setDeletedReceiptIds(deletedReceiptIds));
-			if (deletedProductIds.length)
-				store.dispatch(setDeletedProductIds(deletedProductIds));
+			const deletedReceiptIds = readDeletedIds(window.localStorage, deletedReceiptStorageKey);
+			const deletedProductIds = readDeletedIds(window.localStorage, deletedProductStorageKey);
+			if (deletedReceiptIds.length) store.dispatch(setDeletedReceiptIds(deletedReceiptIds));
+			if (deletedProductIds.length) store.dispatch(setDeletedProductIds(deletedProductIds));
 		} catch (error) {
 			console.error('Unable to restore saved inventory preferences.', error);
 		}

@@ -46,10 +46,7 @@ export function ProductsView() {
 	const [selectedType, setSelectedType] = useState('All products');
 	const [pendingDelete, setPendingDelete] = useState<Product | null>(null);
 	const [actionError, setActionError] = useState<string | null>(null);
-	const types = useMemo(
-		() => [...new Set(products.map(({ type }) => type))].sort(),
-		[products],
-	);
+	const types = useMemo(() => [...new Set(products.map(({ type }) => type))].sort(), [products]);
 	const receiptsById = useMemo(
 		() => new Map(receipts.map((receipt) => [receipt.id, receipt])),
 		[receipts],
@@ -69,11 +66,7 @@ export function ProductsView() {
 	const confirmDelete = () => {
 		if (!pendingDelete) return;
 		try {
-			persistDeletedId(
-				window.localStorage,
-				deletedProductStorageKey,
-				pendingDelete.id,
-			);
+			persistDeletedId(window.localStorage, deletedProductStorageKey, pendingDelete.id);
 			dispatch(deleteProduct(pendingDelete.id));
 			setPendingDelete(null);
 			setActionError(null);
@@ -105,12 +98,7 @@ export function ProductsView() {
 		return <PageFeedback kind='loading' message='Loading your products…' />;
 	}
 	if (status === 'failed') {
-		return (
-			<PageFeedback
-				kind='error'
-				message={error ?? 'Inventory could not be loaded.'}
-			/>
-		);
+		return <PageFeedback kind='error' message={error ?? 'Inventory could not be loaded.'} />;
 	}
 
 	return (
@@ -152,127 +140,126 @@ export function ProductsView() {
 
 			{visibleProducts.length ? (
 				<div className='catalog__table-wrap'>
-					<table className='catalog__table'>
-						<thead>
-							<tr>
-								<th scope='col'>Product</th>
+					<div className='catalog__table-inner'>
+						<table className='catalog__table'>
+							<thead>
+								<tr>
+									<th scope='col'>Product</th>
 
-								<th scope='col'>Status</th>
+									<th scope='col'>Status</th>
 
-								<th scope='col'>Warranty period</th>
+									<th scope='col'>Warranty period</th>
 
-								<th scope='col'>Condition</th>
+									<th scope='col'>Condition</th>
 
-								<th scope='col'>Value</th>
+									<th scope='col'>Value</th>
 
-								<th scope='col'>Receipt</th>
+									<th scope='col'>Receipt</th>
 
-								<th scope='col'>
-									<span className='sr-only'>Actions</span>
-								</th>
-							</tr>
-						</thead>
+									<th scope='col'>
+										<span className='sr-only'>Actions</span>
+									</th>
+								</tr>
+							</thead>
 
-						<tbody>
-							{visibleProducts.map((product, index) => {
-								const receipt = receiptsById.get(product.receiptId);
-								return (
-									<tr
-										key={product.id}
-										style={{ animationDelay: `${index * 45}ms` }}
-									>
-										<td>
-											<div className='catalog__product'>
-												<span className='catalog__product-icon'>
-													<Monitor size={20} strokeWidth={1.65} />
+							<tbody>
+								{/* TODO: Make link */}
+								{visibleProducts.map((product, index) => {
+									const receipt = receiptsById.get(product.receiptId);
+									return (
+										<tr key={product.id} style={{ animationDelay: `${index * 45}ms` }}>
+											<td>
+												<div className='catalog__product'>
+													<span className='catalog__product-icon'>
+														<Monitor size={20} strokeWidth={1.65} />
+													</span>
+
+													<span className='catalog__product-copy'>
+														<strong>{product.title}</strong>
+
+														<small>
+															{product.serialNumber} <span>·</span> {product.type}
+														</small>
+													</span>
+												</div>
+											</td>
+
+											<td>
+												<span
+													className={`catalog__status ${product.status === 'Available' ? 'catalog__status--available' : 'catalog__status--repair'}`}
+												>
+													<span />
+													{product.status}
 												</span>
+											</td>
 
-												<span className='catalog__product-copy'>
-													<strong>{product.title}</strong>
+											<td>
+												<div className='catalog__warranty'>
+													<span>
+														{formatCompactDate(product.guarantee.start)} <ChevronRight size={12} />
+														{formatCompactDate(product.guarantee.end)}
+													</span>
 
 													<small>
-														{product.serialNumber} <span>·</span> {product.type}
+														{formatDate(product.guarantee.start)} —
+														{formatDate(product.guarantee.end)}
 													</small>
-												</span>
-											</div>
-										</td>
+												</div>
+											</td>
 
-										<td>
-											<span
-												className={`catalog__status ${product.status === 'Available' ? 'catalog__status--available' : 'catalog__status--repair'}`}
-											>
-												<span />
-												{product.status}
-											</span>
-										</td>
-
-										<td>
-											<div className='catalog__warranty'>
-												<span>
-													{formatCompactDate(product.guarantee.start)}{' '}
-													<ChevronRight size={12} />
-													{formatCompactDate(product.guarantee.end)}
-												</span>
-
-												<small>
-													{formatDate(product.guarantee.start)} —
-													{formatDate(product.guarantee.end)}
-												</small>
-											</div>
-										</td>
-
-										<td>
-											<span
-												className={`catalog__condition${product.isNew ? '' : ' catalog__condition--used'}`}
-											>
-												{product.isNew ? 'New' : 'Pre-owned'}
-											</span>
-										</td>
-
-										<td>
-											<div className='catalog__value'>
-												{product.prices.map((price) => (
-													<span key={price.currency}>
-														{formatPrice(price.value, price.currency)}
-													</span>
-												))}
-											</div>
-										</td>
-
-										<td>
-											{receipt ? (
-												<Link
-													className='catalog__receipt-link'
-													href='/receipts'
-													onClick={() => dispatch(selectReceipt(receipt.id))}
+											<td>
+												<span
+													className={`catalog__condition${product.isNew ? '' : ' catalog__condition--used'}`}
 												>
-													{receipt.title}
-													<small>{receipt.id}</small>
-												</Link>
-											) : (
-												<span className='catalog__unlinked-receipt'>—</span>
-											)}
-										</td>
+													{product.isNew ? 'New' : 'Pre-owned'}
+												</span>
+											</td>
 
-										<td>
-											<button
-												className='icon-button catalog__action'
-												type='button'
-												aria-label={`Delete ${product.title}`}
-												title={`Delete ${product.title}`}
-												onClick={() => {
-													setActionError(null);
-													setPendingDelete(product);
-												}}
-											>
-												<Trash2 size={15} />
-											</button>
-										</td>
-									</tr>
-								);
-							})}
-						</tbody>
-					</table>
+											<td>
+												<div className='catalog__value'>
+													{product.prices.map((price) => (
+														<span key={price.currency}>
+															{formatPrice(price.value, price.currency)}
+														</span>
+													))}
+												</div>
+											</td>
+
+											<td>
+												{receipt ? (
+													<Link
+														className='catalog__receipt-link'
+														href='/receipts'
+														onClick={() => dispatch(selectReceipt(receipt.id))}
+													>
+														{receipt.title}
+														<small>{receipt.id}</small>
+													</Link>
+												) : (
+													<span className='catalog__unlinked-receipt'>—</span>
+												)}
+											</td>
+
+											<td>
+												<button
+													className='icon-button catalog__action'
+													type='button'
+													aria-label={`Delete ${product.title}`}
+													title={`Delete ${product.title}`}
+													onClick={() => {
+														setActionError(null);
+														setPendingDelete(product);
+													}}
+												>
+													<Trash2 size={15} />
+												</button>
+											</td>
+										</tr>
+									);
+								})}
+							</tbody>
+						</table>
+					</div>
 
 					<div className='catalog__table-footer'>
 						<span>
@@ -286,16 +273,10 @@ export function ProductsView() {
 			) : (
 				<div className='empty-state empty-state--catalog'>
 					<span className='empty-state__icon'>
-						{products.length === 0 ? (
-							<RotateCcw size={20} />
-						) : (
-							<Monitor size={20} />
-						)}
+						{products.length === 0 ? <RotateCcw size={20} /> : <Monitor size={20} />}
 					</span>
 
-					<strong>
-						{products.length === 0 ? 'No products left' : 'No products found'}
-					</strong>
+					<strong>{products.length === 0 ? 'No products left' : 'No products found'}</strong>
 
 					<span>
 						{products.length === 0
@@ -362,8 +343,7 @@ function ProductDeleteDialog({
 			title='Delete this product?'
 			description={
 				<>
-					This will remove <strong>{product.title}</strong> from the catalog and
-					its receipt.
+					This will remove <strong>{product.title}</strong> from the catalog and its receipt.
 				</>
 			}
 			details={
