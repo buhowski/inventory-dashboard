@@ -16,12 +16,14 @@ export function LiveStatus() {
 		const socketUrl =
 			process.env.NEXT_PUBLIC_SOCKET_URL ??
 			`${window.location.protocol}//${window.location.hostname}:3001`;
-		const socket: Socket = io(socketUrl, { transports: ['websocket', 'polling'] });
-		socket.on('active-count', (count: number) => setActiveTabs(count));
-		socket.on('connect_error', (error) => {
-			console.error('Unable to connect to live presence.', error.message);
-			setActiveTabs(null);
+
+		const socket: Socket = io(socketUrl, {
+			transports: ['websocket', 'polling'],
+			reconnectionDelayMax: 10_000,
 		});
+
+		socket.on('active-count', setActiveTabs);
+		socket.on('disconnect', () => setActiveTabs(null));
 
 		return () => {
 			window.clearInterval(timer);
