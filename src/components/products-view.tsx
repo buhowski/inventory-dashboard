@@ -31,7 +31,7 @@ import {
 	deleteProduct,
 	loadInventory,
 	resetDeletedInventory,
-	selectOrder,
+	selectReceipt,
 	setSearchQuery,
 	type AppDispatch,
 	type RootState,
@@ -39,31 +39,41 @@ import {
 import type { Product } from '@/lib/types';
 
 export function ProductsView() {
-	const { orders, products, searchQuery, status, error } = useSelector(
+	const { receipts, products, searchQuery, status, error } = useSelector(
 		(state: RootState) => state.inventory,
 	);
 	const dispatch = useDispatch<AppDispatch>();
 	const [selectedType, setSelectedType] = useState('All products');
 	const [pendingDelete, setPendingDelete] = useState<Product | null>(null);
 	const [actionError, setActionError] = useState<string | null>(null);
-	const types = useMemo(() => [...new Set(products.map(({ type }) => type))].sort(), [products]);
-	const ordersById = useMemo(() => new Map(orders.map((order) => [order.id, order])), [orders]);
+	const types = useMemo(
+		() => [...new Set(products.map(({ type }) => type))].sort(),
+		[products],
+	);
+	const receiptsById = useMemo(
+		() => new Map(receipts.map((receipt) => [receipt.id, receipt])),
+		[receipts],
+	);
 	const visibleProducts = useMemo(
 		() =>
 			products.filter((product) => {
-				const order = ordersById.get(product.orderId);
+				const receipt = receiptsById.get(product.receiptId);
 				return (
 					(selectedType === 'All products' || product.type === selectedType) &&
-					matchesSearch(getProductSearchText(product, order), searchQuery)
+					matchesSearch(getProductSearchText(product, receipt), searchQuery)
 				);
 			}),
-		[ordersById, products, searchQuery, selectedType],
+		[receiptsById, products, searchQuery, selectedType],
 	);
 
 	const confirmDelete = () => {
 		if (!pendingDelete) return;
 		try {
-			persistDeletedId(window.localStorage, deletedProductStorageKey, pendingDelete.id);
+			persistDeletedId(
+				window.localStorage,
+				deletedProductStorageKey,
+				pendingDelete.id,
+			);
 			dispatch(deleteProduct(pendingDelete.id));
 			setPendingDelete(null);
 			setActionError(null);
@@ -95,7 +105,12 @@ export function ProductsView() {
 		return <PageFeedback kind='loading' message='Loading your products…' />;
 	}
 	if (status === 'failed') {
-		return <PageFeedback kind='error' message={error ?? 'Inventory could not be loaded.'} />;
+		return (
+			<PageFeedback
+				kind='error'
+				message={error ?? 'Inventory could not be loaded.'}
+			/>
+		);
 	}
 
 	return (
@@ -150,7 +165,7 @@ export function ProductsView() {
 
 								<th scope='col'>Value</th>
 
-								<th scope='col'>Order</th>
+								<th scope='col'>Receipt</th>
 
 								<th scope='col'>
 									<span className='sr-only'>Actions</span>
@@ -160,9 +175,12 @@ export function ProductsView() {
 
 						<tbody>
 							{visibleProducts.map((product, index) => {
-								const order = ordersById.get(product.orderId);
+								const receipt = receiptsById.get(product.receiptId);
 								return (
-									<tr key={product.id} style={{ animationDelay: `${index * 45}ms` }}>
+									<tr
+										key={product.id}
+										style={{ animationDelay: `${index * 45}ms` }}
+									>
 										<td>
 											<div className='catalog__product'>
 												<span className='catalog__product-icon'>
@@ -191,12 +209,14 @@ export function ProductsView() {
 										<td>
 											<div className='catalog__warranty'>
 												<span>
-													{formatCompactDate(product.guarantee.start)} <ChevronRight size={12} />
+													{formatCompactDate(product.guarantee.start)}{' '}
+													<ChevronRight size={12} />
 													{formatCompactDate(product.guarantee.end)}
 												</span>
 
 												<small>
-													{formatDate(product.guarantee.start)} —{formatDate(product.guarantee.end)}
+													{formatDate(product.guarantee.start)} —
+													{formatDate(product.guarantee.end)}
 												</small>
 											</div>
 										</td>
@@ -220,17 +240,17 @@ export function ProductsView() {
 										</td>
 
 										<td>
-											{order ? (
+											{receipt ? (
 												<Link
-													className='catalog__order-link'
-													href='/orders'
-													onClick={() => dispatch(selectOrder(order.id))}
+													className='catalog__receipt-link'
+													href='/receipts'
+													onClick={() => dispatch(selectReceipt(receipt.id))}
 												>
-													{order.title}
-													<small>{order.id}</small>
+													{receipt.title}
+													<small>{receipt.id}</small>
 												</Link>
 											) : (
-												<span className='catalog__unlinked-order'>—</span>
+												<span className='catalog__unlinked-receipt'>—</span>
 											)}
 										</td>
 
@@ -266,10 +286,16 @@ export function ProductsView() {
 			) : (
 				<div className='empty-state empty-state--catalog'>
 					<span className='empty-state__icon'>
-						{products.length === 0 ? <RotateCcw size={20} /> : <Monitor size={20} />}
+						{products.length === 0 ? (
+							<RotateCcw size={20} />
+						) : (
+							<Monitor size={20} />
+						)}
 					</span>
 
-					<strong>{products.length === 0 ? 'No products left' : 'No products found'}</strong>
+					<strong>
+						{products.length === 0 ? 'No products left' : 'No products found'}
+					</strong>
 
 					<span>
 						{products.length === 0
@@ -336,7 +362,8 @@ function ProductDeleteDialog({
 			title='Delete this product?'
 			description={
 				<>
-					This will remove <strong>{product.title}</strong> from the catalog and its order.
+					This will remove <strong>{product.title}</strong> from the catalog and
+					its receipt.
 				</>
 			}
 			details={

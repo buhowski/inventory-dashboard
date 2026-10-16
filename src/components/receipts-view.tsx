@@ -23,7 +23,7 @@ import { NewReceiptDialog } from '@/components/ui/new-receipt-dialog';
 import { productTypes as availableProductTypes } from '@/lib/data';
 import {
 	clearLocalInventory,
-	deletedOrderStorageKey,
+	deletedReceiptStorageKey,
 	deletedProductStorageKey,
 	persistDeletedId,
 } from '@/lib/deleted-inventory';
@@ -32,46 +32,61 @@ import {
 	formatCompactDate,
 	formatDate,
 	formatPrice,
-	getOrderProducts,
-	getOrderSearchText,
-	getOrderTotals,
+	getReceiptProducts,
+	getReceiptSearchText,
+	getReceiptTotals,
 	matchesSearch,
 } from '@/lib/inventory';
 import {
-	addOrderWithProducts,
-	deleteOrder,
+	addReceiptWithProducts,
+	deleteReceipt,
 	deleteProduct,
 	loadInventory,
 	resetDeletedInventory,
-	selectOrder,
+	selectReceipt,
 	setSearchQuery,
 	type AppDispatch,
 	type RootState,
 } from '@/lib/store';
-import type { Order, Product } from '@/lib/types';
+import type { Receipt, Product } from '@/lib/types';
 
-export function OrdersView() {
+export function ReceiptsView() {
 	const dispatch = useDispatch<AppDispatch>();
-	const { orders, products, searchQuery, selectedOrderId, status, error } = useSelector(
-		(state: RootState) => state.inventory,
-	);
-	const [pendingDelete, setPendingDelete] = useState<Order | null>(null);
+	const { receipts, products, searchQuery, selectedReceiptId, status, error } =
+		useSelector((state: RootState) => state.inventory);
+	const [pendingDelete, setPendingDelete] = useState<Receipt | null>(null);
 	const [deleteError, setDeleteError] = useState<string | null>(null);
-	const [pendingProductDelete, setPendingProductDelete] = useState<Product | null>(null);
-	const [productDeleteError, setProductDeleteError] = useState<string | null>(null);
+	const [pendingProductDelete, setPendingProductDelete] =
+		useState<Product | null>(null);
+	const [productDeleteError, setProductDeleteError] = useState<string | null>(
+		null,
+	);
 	const [isCreateOpen, setIsCreateOpen] = useState(false);
 	const [createError, setCreateError] = useState<string | null>(null);
 	const [restoreError, setRestoreError] = useState<string | null>(null);
 
-	const visibleOrders = useMemo(
-		() => orders.filter((order) => matchesSearch(getOrderSearchText(order), searchQuery)),
-		[orders, searchQuery],
+	const visibleReceipts = useMemo(
+		() =>
+			receipts.filter((receipt) =>
+				matchesSearch(getReceiptSearchText(receipt), searchQuery),
+			),
+		[receipts, searchQuery],
 	);
-	const selectedOrder = orders.find((order) => order.id === selectedOrderId) ?? null;
-	const totalUnits = orders.reduce((total, order) => total + order.productIds.length, 0);
+	const selectedReceipt =
+		receipts.find((receipt) => receipt.id === selectedReceiptId) ?? null;
+	const totalUnits = receipts.reduce(
+		(total, receipt) => total + receipt.productIds.length,
+		0,
+	);
 	const uniqueTypes = new Set(products.map(({ type }) => type)).size;
 	const receiptProductTypes = useMemo(
-		() => [...new Set([...availableProductTypes, ...products.map(({ type }) => type)])].sort(),
+		() =>
+			[
+				...new Set([
+					...availableProductTypes,
+					...products.map(({ type }) => type),
+				]),
+			].sort(),
 		[products],
 	);
 
@@ -94,21 +109,31 @@ export function OrdersView() {
 	const confirmDelete = () => {
 		if (!pendingDelete) return;
 		try {
-			persistDeletedId(window.localStorage, deletedOrderStorageKey, pendingDelete.id);
-			dispatch(deleteOrder(pendingDelete.id));
-			dispatch(selectOrder(null));
+			persistDeletedId(
+				window.localStorage,
+				deletedReceiptStorageKey,
+				pendingDelete.id,
+			);
+			dispatch(deleteReceipt(pendingDelete.id));
+			dispatch(selectReceipt(null));
 			setPendingDelete(null);
 			setDeleteError(null);
 		} catch (caughtError) {
-			console.error('Unable to save the deleted order.', caughtError);
-			setDeleteError('This order could not be deleted. Check your browser storage and try again.');
+			console.error('Unable to save the deleted receipt.', caughtError);
+			setDeleteError(
+				'This receipt could not be deleted. Check your browser storage and try again.',
+			);
 		}
 	};
 
 	const confirmProductDelete = () => {
 		if (!pendingProductDelete) return;
 		try {
-			persistDeletedId(window.localStorage, deletedProductStorageKey, pendingProductDelete.id);
+			persistDeletedId(
+				window.localStorage,
+				deletedProductStorageKey,
+				pendingProductDelete.id,
+			);
 			dispatch(deleteProduct(pendingProductDelete.id));
 			setPendingProductDelete(null);
 			setProductDeleteError(null);
@@ -120,16 +145,19 @@ export function OrdersView() {
 		}
 	};
 
-	const createReceipt = (order: Order, newProducts: Product[]) => {
+	const createReceipt = (receipt: Receipt, newProducts: Product[]) => {
 		try {
-			persistCreatedInventory(window.localStorage, order, newProducts);
-			dispatch(addOrderWithProducts({ order, products: newProducts }));
+			persistCreatedInventory(window.localStorage, receipt, newProducts);
+			dispatch(addReceiptWithProducts({ receipt, products: newProducts }));
 			dispatch(setSearchQuery(''));
-			dispatch(selectOrder(order.id));
+			dispatch(selectReceipt(receipt.id));
 			setCreateError(null);
 			setIsCreateOpen(false);
 		} catch (caughtError) {
-			console.error('Unable to save the new receipt in this browser.', caughtError);
+			console.error(
+				'Unable to save the new receipt in this browser.',
+				caughtError,
+			);
 			setCreateError(
 				'This receipt could not be saved in this browser. Check available storage and try again.',
 			);
@@ -137,19 +165,24 @@ export function OrdersView() {
 	};
 
 	if (status === 'loading' || status === 'idle') {
-		return <PageFeedback kind='loading' message='Loading your orders…' />;
+		return <PageFeedback kind='loading' message='Loading your receipts…' />;
 	}
 	if (status === 'failed') {
-		return <PageFeedback kind='error' message={error ?? 'Inventory could not be loaded.'} />;
+		return (
+			<PageFeedback
+				kind='error'
+				message={error ?? 'Inventory could not be loaded.'}
+			/>
+		);
 	}
 
 	return (
 		<section className='page'>
 			<PageHeading
-				eyebrow='INVENTORY / ORDERS'
-				title='Orders'
-				count={orders.length}
-				description='Every delivery, organized and accounted for.'
+				eyebrow='INVENTORY / RECEIPTS'
+				title='Receipts'
+				count={receipts.length}
+				description='Track incoming stock and the products added to inventory.'
 				action={
 					<button
 						className='button button--primary'
@@ -168,8 +201,8 @@ export function OrdersView() {
 				<MetricCard
 					icon={<List size={17} />}
 					tone='green'
-					label='TOTAL ORDERS'
-					value={orders.length.toString().padStart(2, '0')}
+					label='TOTAL RECEIPTS'
+					value={receipts.length.toString().padStart(2, '0')}
 					note='Live'
 					noteTone='trend'
 				/>
@@ -179,7 +212,7 @@ export function OrdersView() {
 					tone='blue'
 					label='PRODUCTS RECEIVED'
 					value={totalUnits.toString().padStart(2, '0')}
-					note='across all orders'
+					note='across all receipts'
 					noteTone='caption'
 				/>
 
@@ -193,76 +226,88 @@ export function OrdersView() {
 				/>
 			</div>
 
-			<div className={`orders${selectedOrder ? ' orders--has-detail' : ''}`}>
-				<section className='orders__section' aria-label='Incoming orders'>
-					<div className='orders__heading'>
+			<div
+				className={`receipts${selectedReceipt ? ' receipts--has-detail' : ''}`}
+			>
+				<section className='receipts__section' aria-label='Incoming receipts'>
+					<div className='receipts__heading'>
 						<div>
 							<h2>
-								Recent orders <span>{visibleOrders.length}</span>
+								Recent receipts <span>{visibleReceipts.length}</span>
 							</h2>
 
-							<p>Select an order to inspect its products</p>
+							<p>Select a receipt to inspect its products</p>
 						</div>
 
-						{/* <button className='orders__filter' type='button' disabled>
+						{/* <button className='receipts__filter' type='button' disabled>
 							<CalendarDays size={15} /> All time <ChevronRight size={14} />
 						</button> */}
 					</div>
 
-					{visibleOrders.length ? (
-						<div className='orders__list'>
-							{visibleOrders.map((order, index) => {
-								const orderProducts = getOrderProducts(order, products);
-								const totals = getOrderTotals(orderProducts);
-								const active = selectedOrderId === order.id;
+					{visibleReceipts.length ? (
+						<div className='receipts__list'>
+							{visibleReceipts.map((receipt, index) => {
+								const receiptProducts = getReceiptProducts(receipt, products);
+								const totals = getReceiptTotals(receiptProducts);
+								const active = selectedReceiptId === receipt.id;
 								return (
 									<article
-										className={`order-card${active ? ' order-card--selected' : ''}`}
-										key={order.id}
+										className={`receipt-card${active ? ' receipt-card--selected' : ''}`}
+										key={receipt.id}
 									>
 										<button
-											className='order-card__main'
+											className='receipt-card__main'
 											type='button'
 											aria-pressed={active}
-											onClick={() => dispatch(selectOrder(active ? null : order.id))}
+											onClick={() =>
+												dispatch(selectReceipt(active ? null : receipt.id))
+											}
 										>
-											<span className={`order-card__index`}>0{index + 1}</span>
+											<span className={`receipt-card__index`}>
+												0{index + 1}
+											</span>
 
-											<span className='order-card__copy'>
-												<span className='order-card__title'>{order.title}</span>
+											<span className='receipt-card__copy'>
+												<span className='receipt-card__title'>
+													{receipt.title}
+												</span>
 
-												<span className='order-card__count'>
-													{orderProducts.length}{' '}
-													{orderProducts.length === 1 ? 'product' : 'products'}
+												<span className='receipt-card__count'>
+													{receiptProducts.length}{' '}
+													{receiptProducts.length === 1
+														? 'product'
+														: 'products'}
 												</span>
 											</span>
 
-											<span className='order-card__meta'>
-												<span className='order-card__date--short'>
-													{formatCompactDate(order.date)}
+											<span className='receipt-card__meta'>
+												<span className='receipt-card__date--short'>
+													{formatCompactDate(receipt.receivedAt)}
 												</span>
 
-												<span className='order-card__date--long'>{formatDate(order.date)}</span>
+												<span className='receipt-card__date--long'>
+													{formatDate(receipt.receivedAt)}
+												</span>
 											</span>
 
-											<span className='order-card__total'>
+											<span className='receipt-card__total'>
 												<strong>{formatPrice(totals.USD ?? 0, 'USD')}</strong>
 
 												<span>{formatPrice(totals.UAH ?? 0, 'UAH')}</span>
 											</span>
 
-											<span className='order-card__open' aria-hidden='true'>
+											<span className='receipt-card__open' aria-hidden='true'>
 												<ArrowRight size={16} />
 											</span>
 										</button>
 
 										<button
-											className='icon-button order-card__delete'
+											className='icon-button receipt-card__delete'
 											type='button'
-											aria-label={`Delete ${order.title}`}
+											aria-label={`Delete ${receipt.title}`}
 											onClick={() => {
 												setDeleteError(null);
-												setPendingDelete(order);
+												setPendingDelete(receipt);
 											}}
 										>
 											<Trash2 size={15} />
@@ -274,42 +319,55 @@ export function OrdersView() {
 					) : (
 						<div className='empty-state'>
 							<span className='empty-state__icon'>
-								{orders.length === 0 ? <RotateCcw size={20} /> : <List size={20} />}
+								{receipts.length === 0 ? (
+									<RotateCcw size={20} />
+								) : (
+									<List size={20} />
+								)}
 							</span>
 
-							<strong>{orders.length === 0 ? 'No orders left' : 'No matching orders'}</strong>
+							<strong>
+								{receipts.length === 0
+									? 'No receipts recorded'
+									: 'No matching receipts'}
+							</strong>
 
 							<span>
-								{orders.length === 0
-									? 'There are no orders left. Restore the demo inventory to start over.'
+								{receipts.length === 0
+									? 'Restore the demo inventory to see sample stock receipts.'
 									: 'Try another search term or clear the search.'}
 							</span>
-							{orders.length === 0 && <CatalogRestoreButton onClick={restoreDemoInventory} />}
+							{receipts.length === 0 && (
+								<CatalogRestoreButton onClick={restoreDemoInventory} />
+							)}
 						</div>
 					)}
 					{restoreError && (
-						<p className='delete-dialog__error catalog__action-error' role='alert'>
+						<p
+							className='delete-dialog__error catalog__action-error'
+							role='alert'
+						>
 							{restoreError}
 						</p>
 					)}
-					<div className='orders__footnote'>
-						<span className='orders__footnote-dot' />
-						Showing the latest orders in your workspace
+					<div className='receipts__footnote'>
+						<span className='receipts__footnote-dot' />
+						Showing the latest receipts in your workspace
 					</div>
 				</section>
 
-				{selectedOrder && (
-					<OrderDetails
-						order={selectedOrder}
-						products={getOrderProducts(selectedOrder, products)}
-						onClose={() => dispatch(selectOrder(null))}
+				{selectedReceipt && (
+					<ReceiptDetails
+						receipt={selectedReceipt}
+						products={getReceiptProducts(selectedReceipt, products)}
+						onClose={() => dispatch(selectReceipt(null))}
 						onDeleteProduct={(product) => {
 							setProductDeleteError(null);
 							setPendingProductDelete(product);
 						}}
 						onDelete={() => {
 							setDeleteError(null);
-							setPendingDelete(selectedOrder);
+							setPendingDelete(selectedReceipt);
 						}}
 					/>
 				)}
@@ -317,8 +375,8 @@ export function OrdersView() {
 
 			{pendingDelete && (
 				<DeleteDialog
-					order={pendingDelete}
-					products={getOrderProducts(pendingDelete, products)}
+					receipt={pendingDelete}
+					products={getReceiptProducts(pendingDelete, products)}
 					error={deleteError}
 					onClose={() => {
 						setPendingDelete(null);
@@ -343,7 +401,9 @@ export function OrdersView() {
 			{isCreateOpen && (
 				<NewReceiptDialog
 					productTypes={receiptProductTypes}
-					existingSerialNumbers={products.map(({ serialNumber }) => serialNumber)}
+					existingSerialNumbers={products.map(
+						({ serialNumber }) => serialNumber,
+					)}
 					error={createError}
 					onClose={() => {
 						setIsCreateOpen(false);
@@ -356,53 +416,59 @@ export function OrdersView() {
 	);
 }
 
-function OrderDetails({
-	order,
+function ReceiptDetails({
+	receipt,
 	products,
 	onClose,
 	onDeleteProduct,
 	onDelete,
 }: {
-	order: Order;
-	products: ReturnType<typeof getOrderProducts>;
+	receipt: Receipt;
+	products: ReturnType<typeof getReceiptProducts>;
 	onClose: () => void;
 	onDeleteProduct: (product: Product) => void;
 	onDelete: () => void;
 }) {
-	const totals = getOrderTotals(products);
+	const totals = getReceiptTotals(products);
 
 	return (
-		<aside className='order-details' aria-label={`Details for ${order.title}`}>
-			<div className='order-details__top'>
-				<div className='order-details__eyebrow'>
+		<aside
+			className='receipt-details'
+			aria-label={`Details for ${receipt.title}`}
+		>
+			<div className='receipt-details__top'>
+				<div className='receipt-details__eyebrow'>
 					<span className='eyebrow__dot' />
-					ORDER DETAILS
+					RECEIPT DETAILS
 				</div>
 
 				<button
-					className='icon-button order-details__close'
+					className='icon-button receipt-details__close'
 					type='button'
 					onClick={onClose}
-					aria-label='Close order details'
+					aria-label='Close receipt details'
 				>
 					<X size={16} />
 				</button>
 
-				<h2>{order.title}</h2>
+				<h2>{receipt.title}</h2>
 
-				<p className='order-details__description'>{order.description}</p>
+				<p className='receipt-details__description'>{receipt.description}</p>
 
-				<div className='order-details__date'>
-					<CalendarDays size={14} /> Received {formatDate(order.date)}
+				<div className='receipt-details__date'>
+					<CalendarDays size={14} /> Received {formatDate(receipt.receivedAt)}
 				</div>
 
-				<div className='order-details__reference' aria-label={'Order ID ' + order.id}>
-					<span>ORDER ID</span>
-					<code>{order.id}</code>
+				<div
+					className='receipt-details__reference'
+					aria-label={'Receipt ID ' + receipt.id}
+				>
+					<span>RECEIPT ID</span>
+					<code>{receipt.id}</code>
 				</div>
 			</div>
 
-			<div className='order-details__summary'>
+			<div className='receipt-details__summary'>
 				<div>
 					<span>ITEMS</span>
 
@@ -410,37 +476,37 @@ function OrderDetails({
 				</div>
 
 				<div>
-					<span>ORDER TOTAL</span>
+					<span>TOTAL VALUE</span>
 
 					<strong>{formatPrice(totals.USD ?? 0, 'USD')}</strong>
 					<small>{formatPrice(totals.UAH ?? 0, 'UAH')}</small>
 				</div>
 			</div>
 
-			<div className='order-details__products-heading'>
+			<div className='receipt-details__products-heading'>
 				<h3>Included products</h3>
 
 				<span>{products.length}</span>
 			</div>
 
-			<div className='order-details__products'>
+			<div className='receipt-details__products'>
 				{products.map((product) => (
-					<div className='order-details__product' key={product.id}>
+					<div className='receipt-details__product' key={product.id}>
 						<ProductThumbnail />
 
-						<div className='order-details__product-copy'>
+						<div className='receipt-details__product-copy'>
 							<strong>{product.title}</strong>
 
 							<span>{product.serialNumber}</span>
 						</div>
 
 						<span
-							className={`order-details__status-dot ${product.status === 'Available' ? 'order-details__status-dot--available' : 'order-details__status-dot--repair'}`}
+							className={`receipt-details__status-dot ${product.status === 'Available' ? 'receipt-details__status-dot--available' : 'receipt-details__status-dot--repair'}`}
 						/>
 						<button
-							className='icon-button order-details__product-delete'
+							className='icon-button receipt-details__product-delete'
 							type='button'
-							aria-label={`Delete ${product.title} from ${order.title}`}
+							aria-label={`Delete ${product.title} from ${receipt.title}`}
 							title={`Delete ${product.title}`}
 							onClick={() => onDeleteProduct(product)}
 						>
@@ -450,13 +516,18 @@ function OrderDetails({
 				))}
 			</div>
 
-			<div className='order-details__footer'>
+			<div className='receipt-details__footer'>
 				<span>
-					<span className='order-details__footer-dot' /> All items accounted for
+					<span className='receipt-details__footer-dot' /> All items accounted
+					for
 				</span>
 
-				<button className='text-button text-button--danger' type='button' onClick={onDelete}>
-					<Trash2 size={14} /> Delete order
+				<button
+					className='text-button text-button--danger'
+					type='button'
+					onClick={onDelete}
+				>
+					<Trash2 size={14} /> Delete receipt
 				</button>
 			</div>
 		</aside>
@@ -464,14 +535,14 @@ function OrderDetails({
 }
 
 function DeleteDialog({
-	order,
+	receipt,
 	products,
 	error,
 	onClose,
 	onConfirm,
 }: {
-	order: Order;
-	products: ReturnType<typeof getOrderProducts>;
+	receipt: Receipt;
+	products: ReturnType<typeof getReceiptProducts>;
 	error: string | null;
 	onClose: () => void;
 	onConfirm: () => void;
@@ -479,10 +550,11 @@ function DeleteDialog({
 	return (
 		<DeleteConfirmationDialog
 			titleId='delete-title'
-			title='Delete this order?'
+			title='Delete this receipt?'
 			description={
 				<>
-					This will remove <strong>{order.title}</strong> and its products from your orders list.
+					This will remove <strong>{receipt.title}</strong> and its products
+					from your receipts list.
 				</>
 			}
 			details={
@@ -501,13 +573,15 @@ function DeleteDialog({
 						</div>
 					))}
 					{products.length > 2 && (
-						<span className='delete-dialog__more-products'>+ {products.length - 2} more items</span>
+						<span className='delete-dialog__more-products'>
+							+ {products.length - 2} more items
+						</span>
 					)}
 				</>
 			}
 			error={error}
-			cancelLabel='Keep order'
-			confirmLabel='Delete order'
+			cancelLabel='Keep receipt'
+			confirmLabel='Delete receipt'
 			onClose={onClose}
 			onConfirm={onConfirm}
 		/>
@@ -527,11 +601,12 @@ function ProductDeleteDialog({
 }) {
 	return (
 		<DeleteConfirmationDialog
-			titleId='delete-order-product-title'
+			titleId='delete-receipt-product-title'
 			title='Delete this product?'
 			description={
 				<>
-					This will remove <strong>{product.title}</strong> from the catalog and this order.
+					This will remove <strong>{product.title}</strong> from the catalog and
+					this receipt.
 				</>
 			}
 			details={

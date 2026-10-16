@@ -3,7 +3,7 @@
 import { useId, useState, type FormEvent } from 'react';
 import { ChevronDown, Plus, Trash2, X } from '@/components/icons';
 import { DialogOverlay } from '@/components/ui/dialog-overlay';
-import type { Order, Product } from '@/lib/types';
+import type { Receipt, Product } from '@/lib/types';
 
 type ProductDraft = {
 	key: string;
@@ -26,7 +26,7 @@ type NewReceiptDialogProps = {
 	existingSerialNumbers: string[];
 	error: string | null;
 	onClose: () => void;
-	onCreate: (order: Order, products: Product[]) => void;
+	onCreate: (receipt: Receipt, products: Product[]) => void;
 };
 
 function toDateInputValue(date: Date): string {
@@ -44,7 +44,9 @@ function dateAfterYears(value: string, years: number): string {
 }
 
 function createDraftKey(): string {
-	return globalThis.crypto?.randomUUID?.() ?? String(Date.now()) + Math.random();
+	return (
+		globalThis.crypto?.randomUUID?.() ?? String(Date.now()) + Math.random()
+	);
 }
 
 function createProductDraft(receivedDate: string): ProductDraft {
@@ -65,9 +67,15 @@ function createProductDraft(receivedDate: string): ProductDraft {
 	};
 }
 
-function createRecordId(prefix: 'ORD' | 'PRD'): string {
+function createRecordId(prefix: 'RCT' | 'PRD'): string {
 	return (
-		prefix + '-' + globalThis.crypto.randomUUID().replaceAll('-', '').slice(0, 16).toUpperCase()
+		prefix +
+		'-' +
+		globalThis.crypto
+			.randomUUID()
+			.replaceAll('-', '')
+			.slice(0, 16)
+			.toUpperCase()
 	);
 }
 
@@ -131,7 +139,9 @@ export function NewReceiptDialog({
 	const [receiptTitle, setReceiptTitle] = useState('');
 	const [receivedDate, setReceivedDate] = useState(initialDate);
 	const [description, setDescription] = useState('');
-	const [drafts, setDrafts] = useState<ProductDraft[]>(() => [createProductDraft(initialDate)]);
+	const [drafts, setDrafts] = useState<ProductDraft[]>(() => [
+		createProductDraft(initialDate),
+	]);
 	const [formError, setFormError] = useState<string | null>(null);
 	const [showDateErrors, setShowDateErrors] = useState(false);
 	const todayInputDate = toDateInputValue(new Date());
@@ -150,7 +160,9 @@ export function NewReceiptDialog({
 	) => {
 		setFormError(null);
 		setDrafts((currentDrafts) =>
-			currentDrafts.map((draft) => (draft.key === key ? { ...draft, [field]: value } : draft)),
+			currentDrafts.map((draft) =>
+				draft.key === key ? { ...draft, [field]: value } : draft,
+			),
 		);
 	};
 
@@ -179,7 +191,9 @@ export function NewReceiptDialog({
 			const start = toStoredDate(draft.guaranteeStart);
 			const end = toStoredDate(draft.guaranteeEnd);
 			if (!start || !end) {
-				setFormError('Enter a valid received date and valid warranty dates for every product.');
+				setFormError(
+					'Enter a valid received date and valid warranty dates for every product.',
+				);
 				return;
 			}
 			warrantyDates.push({ start, end });
@@ -197,31 +211,42 @@ export function NewReceiptDialog({
 			return;
 		}
 
-		const serialNumbers = drafts.map((draft) => draft.serialNumber.trim().toLocaleLowerCase());
+		const serialNumbers = drafts.map((draft) =>
+			draft.serialNumber.trim().toLocaleLowerCase(),
+		);
 		const savedSerialNumbers = new Set(
-			existingSerialNumbers.map((serialNumber) => serialNumber.trim().toLocaleLowerCase()),
+			existingSerialNumbers.map((serialNumber) =>
+				serialNumber.trim().toLocaleLowerCase(),
+			),
 		);
 		const hasDuplicateSerial = serialNumbers.some(
 			(serialNumber, index) =>
-				serialNumbers.indexOf(serialNumber) !== index || savedSerialNumbers.has(serialNumber),
+				serialNumbers.indexOf(serialNumber) !== index ||
+				savedSerialNumbers.has(serialNumber),
 		);
 
 		if (hasDuplicateSerial) {
-			setFormError('Each serial number must be unique and not already in the inventory.');
+			setFormError(
+				'Each serial number must be unique and not already in the inventory.',
+			);
 			return;
 		}
 
 		if (drafts.some((draft) => draft.guaranteeEnd < draft.guaranteeStart)) {
-			setFormError('A warranty end date cannot be earlier than its start date.');
+			setFormError(
+				'A warranty end date cannot be earlier than its start date.',
+			);
 			return;
 		}
 
 		if (drafts.some((draft) => calculateUahPrice(draft.priceUsd) === null)) {
-			setFormError('Enter a USD price up to $222,222,222.22 with no more than 2 decimal places.');
+			setFormError(
+				'Enter a USD price up to $222,222,222.22 with no more than 2 decimal places.',
+			);
 			return;
 		}
 
-		const orderId = createRecordId('ORD');
+		const receiptId = createRecordId('RCT');
 		const newProducts: Product[] = drafts.map((draft, index) => ({
 			id: createRecordId('PRD'),
 			serialNumber: draft.serialNumber.trim(),
@@ -235,17 +260,17 @@ export function NewReceiptDialog({
 				{ currency: 'USD', value: parseUsdPrice(draft.priceUsd) ?? 0 },
 				{ currency: 'UAH', value: calculateUahPrice(draft.priceUsd) ?? 0 },
 			],
-			orderId,
+			receiptId,
 		}));
-		const order: Order = {
-			id: orderId,
+		const receipt: Receipt = {
+			id: receiptId,
 			title: receiptTitle.trim(),
-			date: receivedAt,
+			receivedAt,
 			description: description.trim(),
 			productIds: newProducts.map((product) => product.id),
 		};
 
-		onCreate(order, newProducts);
+		onCreate(receipt, newProducts);
 	};
 
 	return (
@@ -272,7 +297,8 @@ export function NewReceiptDialog({
 					</button>
 					<h2 id={titleId}>New receipt</h2>
 					<p id={descriptionId}>
-						Record products received into inventory. Demo changes are saved in this browser only.
+						Record products received into inventory. Demo changes are saved in
+						this browser only.
 					</p>
 				</header>
 
@@ -284,7 +310,10 @@ export function NewReceiptDialog({
 							</p>
 						)}
 
-						<section className='receipt-form__section' aria-labelledby={generatedId + '-details'}>
+						<section
+							className='receipt-form__section'
+							aria-labelledby={generatedId + '-details'}
+						>
 							<div className='receipt-form__section-heading'>
 								<h3 id={generatedId + '-details'}>Receipt details</h3>
 								<span>Required fields are marked *</span>
@@ -346,7 +375,7 @@ export function NewReceiptDialog({
 									<textarea
 										name='description'
 										maxLength={500}
-										placeholder='Optional note about this delivery'
+										placeholder='Optional note about this receipt'
 										rows={2}
 										value={description}
 										onChange={(event) => {
@@ -358,7 +387,10 @@ export function NewReceiptDialog({
 							</div>
 						</section>
 
-						<section className='receipt-form__section' aria-labelledby={generatedId + '-products'}>
+						<section
+							className='receipt-form__section'
+							aria-labelledby={generatedId + '-products'}
+						>
 							<div className='receipt-form__section-heading'>
 								<div>
 									<h3 id={generatedId + '-products'}>Products</h3>
@@ -368,7 +400,10 @@ export function NewReceiptDialog({
 									className='text-button receipt-form__add-product'
 									type='button'
 									onClick={() =>
-										setDrafts((current) => [...current, createProductDraft(receivedDate)])
+										setDrafts((current) => [
+											...current,
+											createProductDraft(receivedDate),
+										])
 									}
 								>
 									<Plus size={14} /> Add product
@@ -377,14 +412,16 @@ export function NewReceiptDialog({
 
 							<div className='receipt-form__product-list'>
 								{drafts.map((draft, index) => {
-									const fieldId = (field: string) => generatedId + '-' + draft.key + '-' + field;
+									const fieldId = (field: string) =>
+										generatedId + '-' + draft.key + '-' + field;
 									const uahPrice = calculateUahPrice(draft.priceUsd);
 									const priceUsdError = getUsdPriceError(draft.priceUsd);
 									const warrantyStartError = !draft.guaranteeStart
 										? 'Enter a warranty start date.'
 										: !isValidDateInput(draft.guaranteeStart)
 											? 'Enter a valid date using a four-digit year.'
-											: isValidDateInput(receivedDate) && draft.guaranteeStart > receivedDate
+											: isValidDateInput(receivedDate) &&
+												  draft.guaranteeStart > receivedDate
 												? 'Warranty cannot start after the received date.'
 												: null;
 									const warrantyEndError = !draft.guaranteeEnd
@@ -404,7 +441,9 @@ export function NewReceiptDialog({
 												aria-label={'Remove product ' + (index + 1)}
 												disabled={drafts.length === 1}
 												onClick={() =>
-													setDrafts((current) => current.filter((item) => item.key !== draft.key))
+													setDrafts((current) =>
+														current.filter((item) => item.key !== draft.key),
+													)
 												}
 											>
 												<Trash2 size={14} />
@@ -422,12 +461,19 @@ export function NewReceiptDialog({
 														value={draft.title}
 														maxLength={180}
 														onChange={(event) =>
-															updateProduct(draft.key, 'title', event.target.value)
+															updateProduct(
+																draft.key,
+																'title',
+																event.target.value,
+															)
 														}
 														required
 													/>
 												</label>
-												<label className='receipt-form__field' htmlFor={fieldId('serial')}>
+												<label
+													className='receipt-form__field'
+													htmlFor={fieldId('serial')}
+												>
 													<span>
 														Serial number <span aria-hidden='true'>*</span>
 													</span>
@@ -437,12 +483,19 @@ export function NewReceiptDialog({
 														maxLength={64}
 														autoComplete='off'
 														onChange={(event) =>
-															updateProduct(draft.key, 'serialNumber', event.target.value)
+															updateProduct(
+																draft.key,
+																'serialNumber',
+																event.target.value,
+															)
 														}
 														required
 													/>
 												</label>
-												<label className='receipt-form__field' htmlFor={fieldId('type')}>
+												<label
+													className='receipt-form__field'
+													htmlFor={fieldId('type')}
+												>
 													<span>
 														Type <span aria-hidden='true'>*</span>
 													</span>
@@ -451,7 +504,11 @@ export function NewReceiptDialog({
 															id={fieldId('type')}
 															value={draft.type}
 															onChange={(event) =>
-																updateProduct(draft.key, 'type', event.target.value)
+																updateProduct(
+																	draft.key,
+																	'type',
+																	event.target.value,
+																)
 															}
 															required
 														>
@@ -484,12 +541,19 @@ export function NewReceiptDialog({
 														maxLength={255}
 														placeholder='e.g. 27 in · 4K UHD · USB-C'
 														onChange={(event) =>
-															updateProduct(draft.key, 'specification', event.target.value)
+															updateProduct(
+																draft.key,
+																'specification',
+																event.target.value,
+															)
 														}
 														required
 													/>
 												</label>
-												<label className='receipt-form__field' htmlFor={fieldId('condition')}>
+												<label
+													className='receipt-form__field'
+													htmlFor={fieldId('condition')}
+												>
 													<span>Condition</span>
 													<div className='receipt-form__select-wrap'>
 														<select
@@ -513,7 +577,10 @@ export function NewReceiptDialog({
 														/>
 													</div>
 												</label>
-												<label className='receipt-form__field' htmlFor={fieldId('status')}>
+												<label
+													className='receipt-form__field'
+													htmlFor={fieldId('status')}
+												>
 													<span>Status</span>
 													<div className='receipt-form__select-wrap'>
 														<select
@@ -537,15 +604,24 @@ export function NewReceiptDialog({
 														/>
 													</div>
 												</label>
-												<label className='receipt-form__field' htmlFor={fieldId('guaranteeStart')}>
+												<label
+													className='receipt-form__field'
+													htmlFor={fieldId('guaranteeStart')}
+												>
 													<span>
 														Warranty starts <span aria-hidden='true'>*</span>
 													</span>
 													<input
 														id={fieldId('guaranteeStart')}
 														type='date'
-														max={isValidDateInput(receivedDate) ? receivedDate : todayInputDate}
-														aria-invalid={showDateErrors && Boolean(warrantyStartError)}
+														max={
+															isValidDateInput(receivedDate)
+																? receivedDate
+																: todayInputDate
+														}
+														aria-invalid={
+															showDateErrors && Boolean(warrantyStartError)
+														}
 														aria-describedby={
 															showDateErrors && warrantyStartError
 																? fieldId('guaranteeStart-error')
@@ -554,7 +630,11 @@ export function NewReceiptDialog({
 														value={draft.guaranteeStart}
 														onInvalid={() => setShowDateErrors(true)}
 														onChange={(event) =>
-															updateProduct(draft.key, 'guaranteeStart', event.target.value)
+															updateProduct(
+																draft.key,
+																'guaranteeStart',
+																event.target.value,
+															)
 														}
 														required
 													/>
@@ -568,7 +648,10 @@ export function NewReceiptDialog({
 														</small>
 													)}
 												</label>
-												<label className='receipt-form__field' htmlFor={fieldId('guaranteeEnd')}>
+												<label
+													className='receipt-form__field'
+													htmlFor={fieldId('guaranteeEnd')}
+												>
 													<span>
 														Warranty ends <span aria-hidden='true'>*</span>
 													</span>
@@ -577,7 +660,9 @@ export function NewReceiptDialog({
 														type='date'
 														min={draft.guaranteeStart}
 														max='9999-12-31'
-														aria-invalid={showDateErrors && Boolean(warrantyEndError)}
+														aria-invalid={
+															showDateErrors && Boolean(warrantyEndError)
+														}
 														aria-describedby={
 															showDateErrors && warrantyEndError
 																? fieldId('guaranteeEnd-error')
@@ -586,7 +671,11 @@ export function NewReceiptDialog({
 														value={draft.guaranteeEnd}
 														onInvalid={() => setShowDateErrors(true)}
 														onChange={(event) =>
-															updateProduct(draft.key, 'guaranteeEnd', event.target.value)
+															updateProduct(
+																draft.key,
+																'guaranteeEnd',
+																event.target.value,
+															)
 														}
 														required
 													/>
@@ -600,7 +689,10 @@ export function NewReceiptDialog({
 														</small>
 													)}
 												</label>
-												<label className='receipt-form__field' htmlFor={fieldId('priceUsd')}>
+												<label
+													className='receipt-form__field'
+													htmlFor={fieldId('priceUsd')}
+												>
 													<span>
 														Price (USD) <span aria-hidden='true'>*</span>
 													</span>
@@ -611,10 +703,18 @@ export function NewReceiptDialog({
 														max={MAX_USD_PRICE}
 														inputMode='decimal'
 														aria-invalid={Boolean(priceUsdError)}
-														aria-describedby={priceUsdError ? fieldId('priceUsd-error') : undefined}
+														aria-describedby={
+															priceUsdError
+																? fieldId('priceUsd-error')
+																: undefined
+														}
 														value={draft.priceUsd}
 														onChange={(event) =>
-															updateProduct(draft.key, 'priceUsd', event.target.value)
+															updateProduct(
+																draft.key,
+																'priceUsd',
+																event.target.value,
+															)
 														}
 														required
 													/>
@@ -628,7 +728,9 @@ export function NewReceiptDialog({
 													)}
 												</label>
 												<div className='receipt-form__field receipt-form__field--computed'>
-													<span id={fieldId('priceUah-label')}>Price (UAH)</span>
+													<span id={fieldId('priceUah-label')}>
+														Price (UAH)
+													</span>
 													<output
 														className='receipt-form__output'
 														aria-labelledby={fieldId('priceUah-label')}
@@ -653,7 +755,11 @@ export function NewReceiptDialog({
 					</div>
 
 					<footer className='receipt-form__actions'>
-						<button className='button button--quiet' type='button' onClick={onClose}>
+						<button
+							className='button button--quiet'
+							type='button'
+							onClick={onClose}
+						>
 							Cancel
 						</button>
 						<button className='button button--primary' type='submit'>

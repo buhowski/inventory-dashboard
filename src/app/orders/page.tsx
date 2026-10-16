@@ -1,12 +1,5 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import dynamic from 'next/dynamic';
-
-const OrdersView = dynamic(
-	() => import('@/components/orders-view').then((module) => module.OrdersView),
-	{ loading: () => <div className='loading__skeleton' aria-label='Loading orders' /> },
-);
-
-export default function OrdersPage() {
-	return <OrdersView />;
+export default function LegacyOrdersPage() {
+	redirect('/receipts');
 }

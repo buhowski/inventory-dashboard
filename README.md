@@ -46,6 +46,8 @@ yarn build
 ```sh
 inventory-dashboard/
 ├── database/
+│   ├── migrations/
+│   │   └── 001_orders_to_receipts.sql # Rename legacy orders and product links
 │   └── schema.sql            # MySQL schema for review
 ├── Dockerfile                # Multi-stage Docker image for the app
 ├── docker-compose.yml        # App and Socket.IO, with an optional MySQL demo profile

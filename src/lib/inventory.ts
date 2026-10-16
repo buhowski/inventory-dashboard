@@ -1,7 +1,7 @@
-import type { Order, OrderTotals, Product } from '@/lib/types';
+import type { Receipt, ReceiptTotals, Product } from '@/lib/types';
 
-export function getOrderTotals(products: Product[]): OrderTotals {
-	return products.reduce<OrderTotals>((totals, product) => {
+export function getReceiptTotals(products: Product[]): ReceiptTotals {
+	return products.reduce<ReceiptTotals>((totals, product) => {
 		product.prices.forEach(({ currency, value }) => {
 			totals[currency] = (totals[currency] ?? 0) + value;
 		});
@@ -37,16 +37,22 @@ export function matchesSearch(value: string, query: string): boolean {
 	return value.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase());
 }
 
-export function getOrderProducts(order: Order, products: Product[]): Product[] {
-	return order.productIds
+export function getReceiptProducts(
+	receipt: Receipt,
+	products: Product[],
+): Product[] {
+	return receipt.productIds
 		.map((productId) => products.find((product) => product.id === productId))
 		.filter((product): product is Product => product !== undefined);
 }
 
-export function getOrderSearchText(order: Order): string {
-	return `${order.title} ${order.id} ${order.description}`;
+export function getReceiptSearchText(receipt: Receipt): string {
+	return `${receipt.title} ${receipt.id} ${receipt.description}`;
 }
 
-export function getProductSearchText(product: Product, order?: Order): string {
-	return `${product.title} ${product.type} ${product.serialNumber} ${product.specification} ${order?.title ?? ''}`;
+export function getProductSearchText(
+	product: Product,
+	receipt?: Receipt,
+): string {
+	return `${product.title} ${product.type} ${product.serialNumber} ${product.specification} ${receipt?.title ?? ''}`;
 }

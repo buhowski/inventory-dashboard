@@ -1,38 +1,38 @@
-import type { Order, Product } from '@/lib/types';
+import type { Receipt, Product } from '@/lib/types';
 
-// Demo orders and products
-export const orders: Order[] = [
+// Demo receipts and products
+export const receipts: Receipt[] = [
 	{
-		id: 'ORD-1048',
+		id: 'RCT-1048',
 		title: 'Spring workstation refresh',
-		date: '2025-04-06T09:30:00.000Z',
+		receivedAt: '2025-04-06T09:30:00.000Z',
 		description: 'New displays and accessories for the design team.',
 		productIds: ['PRD-1201', 'PRD-1202', 'PRD-1203', 'PRD-1204'],
 	},
 	{
-		id: 'ORD-1047',
+		id: 'RCT-1047',
 		title: 'Studio equipment delivery',
-		date: '2025-03-28T13:15:00.000Z',
+		receivedAt: '2025-03-28T13:15:00.000Z',
 		description: 'Replacement equipment for the production studio.',
 		productIds: ['PRD-1205', 'PRD-1206', 'PRD-1207'],
 	},
 	{
-		id: 'ORD-1046',
+		id: 'RCT-1046',
 		title: 'Office essentials',
-		date: '2025-03-12T10:00:00.000Z',
+		receivedAt: '2025-03-12T10:00:00.000Z',
 		description: 'A small restock of keyboards and pointing devices.',
 		productIds: ['PRD-1208', 'PRD-1209', 'PRD-1210'],
 	},
 	{
-		id: 'ORD-1045',
+		id: 'RCT-1045',
 		title: 'Conference room upgrade',
-		date: '2025-02-21T15:45:00.000Z',
+		receivedAt: '2025-02-21T15:45:00.000Z',
 		description: 'Large-format displays for shared meeting rooms.',
 		productIds: ['PRD-1211', 'PRD-1212', 'PRD-1213'],
 	},
 ];
 
-// Link each product to its order by ID
+// Link each product to its receipt by ID
 export const products: Product[] = [
 	{
 		id: 'PRD-1201',
@@ -42,12 +42,15 @@ export const products: Product[] = [
 		specification: '27 in · 4K UHD · USB-C',
 		isNew: true,
 		status: 'Available',
-		guarantee: { start: '2025-04-06T00:00:00.000Z', end: '2028-04-06T00:00:00.000Z' },
+		guarantee: {
+			start: '2025-04-06T00:00:00.000Z',
+			end: '2028-04-06T00:00:00.000Z',
+		},
 		prices: [
 			{ value: 629, currency: 'USD' },
 			{ value: 25900, currency: 'UAH' },
 		],
-		orderId: 'ORD-1048',
+		receiptId: 'RCT-1048',
 	},
 	{
 		id: 'PRD-1202',
@@ -57,12 +60,15 @@ export const products: Product[] = [
 		specification: '27 in · 4K UHD · USB-C',
 		isNew: true,
 		status: 'Available',
-		guarantee: { start: '2025-04-06T00:00:00.000Z', end: '2028-04-06T00:00:00.000Z' },
+		guarantee: {
+			start: '2025-04-06T00:00:00.000Z',
+			end: '2028-04-06T00:00:00.000Z',
+		},
 		prices: [
 			{ value: 629, currency: 'USD' },
 			{ value: 25900, currency: 'UAH' },
 		],
-		orderId: 'ORD-1048',
+		receiptId: 'RCT-1048',
 	},
 	{
 		id: 'PRD-1203',
@@ -72,12 +78,15 @@ export const products: Product[] = [
 		specification: 'Wireless · US layout · Graphite',
 		isNew: true,
 		status: 'Available',
-		guarantee: { start: '2025-04-06T00:00:00.000Z', end: '2027-04-06T00:00:00.000Z' },
+		guarantee: {
+			start: '2025-04-06T00:00:00.000Z',
+			end: '2027-04-06T00:00:00.000Z',
+		},
 		prices: [
 			{ value: 119, currency: 'USD' },
 			{ value: 4900, currency: 'UAH' },
 		],
-		orderId: 'ORD-1048',
+		receiptId: 'RCT-1048',
 	},
 	{
 		id: 'PRD-1204',
@@ -87,12 +96,15 @@ export const products: Product[] = [
 		specification: 'Wireless · 8K DPI · Black',
 		isNew: false,
 		status: 'In repair',
-		guarantee: { start: '2025-04-06T00:00:00.000Z', end: '2027-04-06T00:00:00.000Z' },
+		guarantee: {
+			start: '2025-04-06T00:00:00.000Z',
+			end: '2027-04-06T00:00:00.000Z',
+		},
 		prices: [
 			{ value: 79, currency: 'USD' },
 			{ value: 3250, currency: 'UAH' },
 		],
-		orderId: 'ORD-1048',
+		receiptId: 'RCT-1048',
 	},
 	{
 		id: 'PRD-1205',
@@ -102,12 +114,15 @@ export const products: Product[] = [
 		specification: '32 in · 4K UHD · HDR',
 		isNew: true,
 		status: 'Available',
-		guarantee: { start: '2025-03-28T00:00:00.000Z', end: '2028-03-28T00:00:00.000Z' },
+		guarantee: {
+			start: '2025-03-28T00:00:00.000Z',
+			end: '2028-03-28T00:00:00.000Z',
+		},
 		prices: [
 			{ value: 899, currency: 'USD' },
 			{ value: 37000, currency: 'UAH' },
 		],
-		orderId: 'ORD-1047',
+		receiptId: 'RCT-1047',
 	},
 	{
 		id: 'PRD-1206',
@@ -117,12 +132,15 @@ export const products: Product[] = [
 		specification: 'Mechanical · US layout · Tactile',
 		isNew: false,
 		status: 'In repair',
-		guarantee: { start: '2025-03-28T00:00:00.000Z', end: '2027-03-28T00:00:00.000Z' },
+		guarantee: {
+			start: '2025-03-28T00:00:00.000Z',
+			end: '2027-03-28T00:00:00.000Z',
+		},
 		prices: [
 			{ value: 189, currency: 'USD' },
 			{ value: 7800, currency: 'UAH' },
 		],
-		orderId: 'ORD-1047',
+		receiptId: 'RCT-1047',
 	},
 	{
 		id: 'PRD-1207',
@@ -132,12 +150,15 @@ export const products: Product[] = [
 		specification: 'Thunderbolt 4 · 12 ports',
 		isNew: true,
 		status: 'Available',
-		guarantee: { start: '2025-03-28T00:00:00.000Z', end: '2027-03-28T00:00:00.000Z' },
+		guarantee: {
+			start: '2025-03-28T00:00:00.000Z',
+			end: '2027-03-28T00:00:00.000Z',
+		},
 		prices: [
 			{ value: 249, currency: 'USD' },
 			{ value: 10200, currency: 'UAH' },
 		],
-		orderId: 'ORD-1047',
+		receiptId: 'RCT-1047',
 	},
 	{
 		id: 'PRD-1208',
@@ -147,12 +168,15 @@ export const products: Product[] = [
 		specification: 'Wireless · US layout · White',
 		isNew: true,
 		status: 'Available',
-		guarantee: { start: '2025-03-12T00:00:00.000Z', end: '2027-03-12T00:00:00.000Z' },
+		guarantee: {
+			start: '2025-03-12T00:00:00.000Z',
+			end: '2027-03-12T00:00:00.000Z',
+		},
 		prices: [
 			{ value: 99, currency: 'USD' },
 			{ value: 4100, currency: 'UAH' },
 		],
-		orderId: 'ORD-1046',
+		receiptId: 'RCT-1046',
 	},
 	{
 		id: 'PRD-1209',
@@ -162,12 +186,15 @@ export const products: Product[] = [
 		specification: 'Wireless · 8K DPI · White',
 		isNew: true,
 		status: 'Available',
-		guarantee: { start: '2025-03-12T00:00:00.000Z', end: '2027-03-12T00:00:00.000Z' },
+		guarantee: {
+			start: '2025-03-12T00:00:00.000Z',
+			end: '2027-03-12T00:00:00.000Z',
+		},
 		prices: [
 			{ value: 79, currency: 'USD' },
 			{ value: 3250, currency: 'UAH' },
 		],
-		orderId: 'ORD-1046',
+		receiptId: 'RCT-1046',
 	},
 	{
 		id: 'PRD-1210',
@@ -177,12 +204,15 @@ export const products: Product[] = [
 		specification: '34 in · WQHD · 144 Hz',
 		isNew: false,
 		status: 'Available',
-		guarantee: { start: '2025-03-12T00:00:00.000Z', end: '2028-03-12T00:00:00.000Z' },
+		guarantee: {
+			start: '2025-03-12T00:00:00.000Z',
+			end: '2028-03-12T00:00:00.000Z',
+		},
 		prices: [
 			{ value: 749, currency: 'USD' },
 			{ value: 30900, currency: 'UAH' },
 		],
-		orderId: 'ORD-1046',
+		receiptId: 'RCT-1046',
 	},
 	{
 		id: 'PRD-1211',
@@ -192,12 +222,15 @@ export const products: Product[] = [
 		specification: '55 in · 4K UHD · Smart display',
 		isNew: true,
 		status: 'Available',
-		guarantee: { start: '2025-02-21T00:00:00.000Z', end: '2028-02-21T00:00:00.000Z' },
+		guarantee: {
+			start: '2025-02-21T00:00:00.000Z',
+			end: '2028-02-21T00:00:00.000Z',
+		},
 		prices: [
 			{ value: 1299, currency: 'USD' },
 			{ value: 53500, currency: 'UAH' },
 		],
-		orderId: 'ORD-1045',
+		receiptId: 'RCT-1045',
 	},
 	{
 		id: 'PRD-1212',
@@ -207,12 +240,15 @@ export const products: Product[] = [
 		specification: '55 in · 4K UHD · Smart display',
 		isNew: true,
 		status: 'Available',
-		guarantee: { start: '2025-02-21T00:00:00.000Z', end: '2028-02-21T00:00:00.000Z' },
+		guarantee: {
+			start: '2025-02-21T00:00:00.000Z',
+			end: '2028-02-21T00:00:00.000Z',
+		},
 		prices: [
 			{ value: 1299, currency: 'USD' },
 			{ value: 53500, currency: 'UAH' },
 		],
-		orderId: 'ORD-1045',
+		receiptId: 'RCT-1045',
 	},
 	{
 		id: 'PRD-1213',
@@ -222,13 +258,18 @@ export const products: Product[] = [
 		specification: 'Wireless · USB-C · Laser pointer',
 		isNew: true,
 		status: 'Available',
-		guarantee: { start: '2025-02-21T00:00:00.000Z', end: '2027-02-21T00:00:00.000Z' },
+		guarantee: {
+			start: '2025-02-21T00:00:00.000Z',
+			end: '2027-02-21T00:00:00.000Z',
+		},
 		prices: [
 			{ value: 89, currency: 'USD' },
 			{ value: 3700, currency: 'UAH' },
 		],
-		orderId: 'ORD-1045',
+		receiptId: 'RCT-1045',
 	},
 ];
 
-export const productTypes = [...new Set(products.map(({ type }) => type))].sort();
+export const productTypes = [
+	...new Set(products.map(({ type }) => type)),
+].sort();

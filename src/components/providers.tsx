@@ -3,14 +3,14 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Provider } from 'react-redux';
 import {
-	deletedOrderStorageKey,
+	deletedReceiptStorageKey,
 	deletedProductStorageKey,
 	readDeletedIds,
 } from '@/lib/deleted-inventory';
 import {
 	loadInventory,
 	makeStore,
-	setDeletedOrderIds,
+	setDeletedReceiptIds,
 	setDeletedProductIds,
 	type AppStore,
 } from '@/lib/store';
@@ -22,10 +22,18 @@ export function Providers({ children }: { children: ReactNode }) {
 	useEffect(() => {
 		// Restore deleted IDs before loading inventory
 		try {
-			const deletedOrderIds = readDeletedIds(window.localStorage, deletedOrderStorageKey);
-			const deletedProductIds = readDeletedIds(window.localStorage, deletedProductStorageKey);
-			if (deletedOrderIds.length) store.dispatch(setDeletedOrderIds(deletedOrderIds));
-			if (deletedProductIds.length) store.dispatch(setDeletedProductIds(deletedProductIds));
+			const deletedReceiptIds = readDeletedIds(
+				window.localStorage,
+				deletedReceiptStorageKey,
+			);
+			const deletedProductIds = readDeletedIds(
+				window.localStorage,
+				deletedProductStorageKey,
+			);
+			if (deletedReceiptIds.length)
+				store.dispatch(setDeletedReceiptIds(deletedReceiptIds));
+			if (deletedProductIds.length)
+				store.dispatch(setDeletedProductIds(deletedProductIds));
 		} catch (error) {
 			console.error('Unable to restore saved inventory preferences.', error);
 		}

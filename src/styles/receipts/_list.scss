@@ -1,23 +1,23 @@
 @use '../tokens' as *;
 @use '../shared' as *;
 
-.orders {
+.receipts {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr);
 	align-items: start;
 	gap: 17px;
 	transition: grid-template-columns 240ms ease;
 
-	// .orders--has-detail
+	// .receipts--has-detail
 	&--has-detail {
 		grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.9fr);
 
-		@media (max-width: $breakpoint-order-detail) {
+		@media (max-width: $breakpoint-receipt-detail) {
 			grid-template-columns: minmax(0, 1fr);
 		}
 	}
 
-	// .orders__section
+	// .receipts__section
 	&__section {
 		@include surface-panel;
 
@@ -28,7 +28,7 @@
 		}
 	}
 
-	// .orders__heading
+	// .receipts__heading
 	&__heading {
 		display: flex;
 		align-items: center;
@@ -57,7 +57,7 @@
 		}
 	}
 
-	// .orders__filter
+	// .receipts__filter
 	&__filter {
 		@include filter-control;
 
@@ -66,13 +66,13 @@
 		}
 	}
 
-	// .orders__list
+	// .receipts__list
 	&__list {
 		display: grid;
 		gap: 8px;
 	}
 
-	// .orders__footnote
+	// .receipts__footnote
 	&__footnote {
 		display: flex;
 		align-items: center;
@@ -82,13 +82,13 @@
 		font-size: 9px;
 	}
 
-	// .orders__footnote-dot
+	// .receipts__footnote-dot
 	&__footnote-dot {
 		@include status-indicator($size: 5px);
 	}
 }
 
-.order-card {
+.receipt-card {
 	position: relative;
 	display: flex;
 	min-height: 75px;
@@ -109,7 +109,7 @@
 		box-shadow: 0 4px 12px rgb(66 94 51 / 6%);
 	}
 
-	// .order-card--selected
+	// .receipt-card--selected
 	&--selected {
 		box-shadow:
 			inset 3px 0 #81bb4a,
@@ -120,13 +120,16 @@
 		transform: translateY(-1px);
 	}
 
-	// .order-card__main
+	// .receipt-card__main
 	&__main {
 		display: grid;
 		width: 100%;
 		min-width: 0;
 		min-height: 73px;
-		grid-template-columns: 35px minmax(125px, 1fr) minmax(80px, 0.54fr) minmax(80px, 0.63fr);
+		grid-template-columns: 35px minmax(125px, 1fr) minmax(80px, 0.54fr) minmax(
+				80px,
+				0.63fr
+			);
 		align-items: center;
 		gap: 11px;
 		padding: 11px 12px;
@@ -143,7 +146,7 @@
 		}
 	}
 
-	// .order-card__index
+	// .receipt-card__index
 	&__index {
 		display: grid;
 		width: 30px;
@@ -169,7 +172,7 @@
 		gap: 5px;
 	}
 
-	// .order-card__title
+	// .receipt-card__title
 	&__title {
 		overflow: hidden;
 		color: #40525b;
@@ -179,13 +182,13 @@
 		white-space: nowrap;
 	}
 
-	// .order-card__count
+	// .receipt-card__count
 	&__count {
 		color: #9aa7ad;
 		font-size: 9px;
 	}
 
-	// .order-card__date--short
+	// .receipt-card__date--short
 	&__date--short {
 		color: #5c707a;
 		font-size: 10px;
@@ -197,13 +200,13 @@
 		}
 	}
 
-	// .order-card__date--long
+	// .receipt-card__date--long
 	&__date--long {
 		color: #9aa7ad;
 		font-size: 9px;
 	}
 
-	// .order-card__total
+	// .receipt-card__total
 	&__total {
 		display: grid;
 		min-width: 0;
@@ -227,7 +230,7 @@
 		}
 	}
 
-	// .order-card__open
+	// .receipt-card__open
 	&__open {
 		position: absolute;
 		z-index: 1;
@@ -254,7 +257,7 @@
 	}
 
 	&--selected {
-		.order-card__open {
+		.receipt-card__open {
 			opacity: 1;
 			transform: translateX(0);
 			transition:
@@ -263,21 +266,21 @@
 				visibility 0s;
 			visibility: visible;
 
-			@media (max-width: $breakpoint-order-detail) {
+			@media (max-width: $breakpoint-receipt-detail) {
 				svg {
 					transform: rotate(90deg);
 				}
 			}
 		}
 
-		.order-card__index {
+		.receipt-card__index {
 			border-color: #dfedd2;
 			background: #f3f8ed;
 			color: #6ea742;
 		}
 	}
 
-	// .order-card__delete
+	// .receipt-card__delete
 	&__delete {
 		margin-right: 8px;
 

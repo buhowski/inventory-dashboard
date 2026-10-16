@@ -3,12 +3,17 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { Package, Settings, ShieldCheck, ShoppingBag } from '@/components/icons';
+import {
+	Package,
+	Settings,
+	ShieldCheck,
+	ShoppingBag,
+} from '@/components/icons';
 import { LiveStatus } from '@/components/live-status';
 import { SearchBar } from '@/components/search-bar';
 
 const navigation = [
-	{ href: '/orders', label: 'Orders', icon: ShoppingBag },
+	{ href: '/receipts', label: 'Receipts', icon: ShoppingBag },
 	{ href: '/products', label: 'Products', icon: Package },
 ];
 
@@ -18,7 +23,7 @@ export function InventoryShell({ children }: { children: ReactNode }) {
 	return (
 		<div className='app'>
 			<header className='topbar'>
-				<Link className='brand' href='/orders' aria-label='Stockroom home'>
+				<Link className='brand' href='/receipts' aria-label='Stockroom home'>
 					<span className='brand__mark'>
 						<ShieldCheck size={19} strokeWidth={2.3} />
 					</span>
@@ -77,7 +82,7 @@ export function InventoryShell({ children }: { children: ReactNode }) {
 
 			<main className='app__main'>
 				<div className='app__mobile-brand'>
-					<Link className='brand' href='/orders'>
+					<Link className='brand' href='/receipts'>
 						<span className='brand__mark'>
 							<ShieldCheck size={18} />
 						</span>

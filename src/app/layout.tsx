@@ -13,7 +13,7 @@ const geistSans = Geist({
 
 export const metadata: Metadata = {
 	title: 'Stockroom — Inventory',
-	description: 'Track incoming orders and keep your product inventory in sync.',
+	description: 'Record incoming stock and keep product details organized.',
 	applicationName: 'Stockroom',
 	manifest: '/manifest.webmanifest',
 	appleWebApp: { capable: true, statusBarStyle: 'default', title: 'Stockroom' },
@@ -25,7 +25,9 @@ export const viewport: Viewport = {
 	initialScale: 1,
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({
+	children,
+}: Readonly<{ children: React.ReactNode }>) {
 	return (
 		<html lang='en' className={geistSans.variable}>
 			<body>

@@ -111,6 +111,7 @@
 	&__caption {
 		margin-left: auto;
 		color: #96a3a9;
+		margin-top: auto;
 		font-size: 9px;
 	}
 
@@ -125,7 +126,6 @@
 
 	// .overview__caption
 	&__caption {
-		margin-top: auto;
 		white-space: nowrap;
 	}
 }

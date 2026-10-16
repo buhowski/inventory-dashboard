@@ -4,7 +4,7 @@ CREATE DATABASE IF NOT EXISTS stockroom
 
 USE stockroom;
 
-CREATE TABLE IF NOT EXISTS orders (
+CREATE TABLE IF NOT EXISTS receipts (
   id VARCHAR(32) NOT NULL,
   title VARCHAR(180) NOT NULL,
   description TEXT NOT NULL,
@@ -12,12 +12,12 @@ CREATE TABLE IF NOT EXISTS orders (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
-  INDEX idx_orders_received_at (received_at)
+  INDEX idx_receipts_received_at (received_at)
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS products (
   id VARCHAR(32) NOT NULL,
-  order_id VARCHAR(32) NOT NULL,
+  receipt_id VARCHAR(32) NOT NULL,
   serial_number VARCHAR(64) NOT NULL,
   title VARCHAR(180) NOT NULL,
   product_type VARCHAR(80) NOT NULL,
@@ -30,10 +30,10 @@ CREATE TABLE IF NOT EXISTS products (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   UNIQUE KEY uq_products_serial_number (serial_number),
-  INDEX idx_products_order_id (order_id),
+  INDEX idx_products_receipt_id (receipt_id),
   INDEX idx_products_type (product_type),
-  CONSTRAINT fk_products_order
-    FOREIGN KEY (order_id) REFERENCES orders (id)
+  CONSTRAINT fk_products_receipt
+    FOREIGN KEY (receipt_id) REFERENCES receipts (id)
     ON UPDATE CASCADE
     ON DELETE CASCADE,
   CONSTRAINT chk_products_guarantee_range

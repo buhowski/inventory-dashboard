@@ -20,15 +20,15 @@ export interface Product {
 	status: 'Available' | 'In repair';
 	guarantee: Guarantee;
 	prices: Price[];
-	orderId: string;
+	receiptId: string;
 }
 
-export interface Order {
+export interface Receipt {
 	id: string;
 	title: string;
-	date: string;
+	receivedAt: string;
 	description: string;
 	productIds: string[];
 }
 
-export type OrderTotals = Partial<Record<Currency, number>>;
+export type ReceiptTotals = Partial<Record<Currency, number>>;

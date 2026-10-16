@@ -1,7 +1,7 @@
 @use '../tokens' as *;
 @use '../shared' as *;
 
-.order-details {
+.receipt-details {
 	@include surface-panel;
 
 	overflow: hidden;
@@ -11,7 +11,7 @@
 		display: block;
 	}
 
-	// .order-details__top
+	// .receipt-details__top
 	&__top {
 		position: relative;
 		padding: 22px 21px 17px;
@@ -34,12 +34,12 @@
 		}
 	}
 
-	// .order-details__eyebrow
+	// .receipt-details__eyebrow
 	&__eyebrow {
 		@include meta-eyebrow;
 	}
 
-	// .order-details__description
+	// .receipt-details__description
 	&__description {
 		margin: 0;
 		color: #87959c;
@@ -47,7 +47,7 @@
 		line-height: 1.6;
 	}
 
-	// .order-details__date
+	// .receipt-details__date
 	&__date {
 		display: flex;
 		align-items: center;
@@ -61,7 +61,7 @@
 		}
 	}
 
-	// .order-details__reference
+	// .receipt-details__reference
 	&__reference {
 		display: flex;
 		align-items: center;
@@ -86,7 +86,7 @@
 		}
 	}
 
-	// .order-details__close
+	// .receipt-details__close
 	&__close {
 		position: absolute;
 		top: 13px;
@@ -101,7 +101,7 @@
 		}
 	}
 
-	// .order-details__summary
+	// .receipt-details__summary
 	&__summary {
 		display: grid;
 		grid-template-columns: 1fr 1.5fr;
@@ -148,7 +148,7 @@
 		}
 	}
 
-	// .order-details__products-heading
+	// .receipt-details__products-heading
 	&__products-heading {
 		display: flex;
 		align-items: center;
@@ -171,7 +171,7 @@
 		}
 	}
 
-	// .order-details__products
+	// .receipt-details__products
 	&__products {
 		display: grid;
 		padding: 0 14px;
@@ -181,7 +181,7 @@
 		}
 	}
 
-	// .order-details__product
+	// .receipt-details__product
 	&__product {
 		display: flex;
 		min-width: 0;
@@ -191,7 +191,7 @@
 		border-bottom: 1px solid #f0f2f3;
 	}
 
-	// .order-details__product-copy
+	// .receipt-details__product-copy
 	&__product-copy {
 		display: grid;
 		min-width: 0;
@@ -213,7 +213,7 @@
 		}
 	}
 
-	// .order-details__product-delete
+	// .receipt-details__product-delete
 	&__product-delete {
 		width: 26px;
 		height: 26px;
@@ -226,22 +226,22 @@
 		}
 	}
 
-	// .order-details__status-dot
+	// .receipt-details__status-dot
 	&__status-dot {
 		@include status-indicator;
 	}
 
-	// .order-details__status-dot--available
+	// .receipt-details__status-dot--available
 	&__status-dot--available {
 		background: #8ac24d;
 	}
 
-	// .order-details__status-dot--repair
+	// .receipt-details__status-dot--repair
 	&__status-dot--repair {
 		background: #d4a24b;
 	}
 
-	// .order-details__footer
+	// .receipt-details__footer
 	&__footer {
 		display: flex;
 		min-height: 45px;
@@ -261,7 +261,7 @@
 		}
 	}
 
-	// .order-details__footer-dot
+	// .receipt-details__footer-dot
 	&__footer-dot {
 		@include status-indicator($size: 6px, $color: #83bc4c);
 	}

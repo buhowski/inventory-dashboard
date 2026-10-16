@@ -322,8 +322,8 @@
 		}
 	}
 
-	// .catalog__order-link
-	&__order-link {
+	// .catalog__receipt-link
+	&__receipt-link {
 		display: grid;
 		min-width: 0;
 		gap: 5px;
@@ -346,8 +346,8 @@
 		}
 	}
 
-	// .catalog__unlinked-order
-	&__unlinked-order {
+	// .catalog__unlinked-receipt
+	&__unlinked-receipt {
 		color: #aab5ba;
 	}
 
